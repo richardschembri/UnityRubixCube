@@ -23,14 +23,14 @@ namespace UnityRubixCube {
                 IsPositive = isPositive;
             }
 
-            public Vector3 GetMoveVector(){
+            public Vector3 GetMoveVector(bool abs = false){
                 switch (MoveAxis){
                     case EMoveAxis.X:
-                        return IsPositive ? Vector3.right : Vector3.left;
+                        return abs || IsPositive ? Vector3.right : Vector3.left;
                     case EMoveAxis.Y:
-                        return IsPositive ? Vector3.up : Vector3.down;
+                        return abs || IsPositive ? Vector3.up : Vector3.down;
                     case EMoveAxis.Z:
-                        return IsPositive ? Vector3.forward : Vector3.back;
+                        return abs || IsPositive ? Vector3.forward : Vector3.back;
                 }
 
                 return Vector3.zero;

@@ -66,12 +66,16 @@ namespace UnityRubixCube {
         }
 
         float _step;
-        public void MoveLayer(RubixCube.Move move){
+        public bool MoveLayer(RubixCube.Move move){
+            if(CurrentRotationState != ERotationState.IDLE){
+                return false;
+            }
             float scale = 1f / ParentCube.CubiesPerSide;
             transform.localRotation = Quaternion.Euler(Vector3.zero);
-            transform.localPosition = move.GetMoveVector() * (scale * move.LayerIndex - 0.5f + (scale / 2f));
+            transform.localPosition = move.GetMoveVector(true) * (scale * move.LayerIndex - 0.5f + (scale / 2f));
             CollectCubies(move);
             TriggerAutoRotate(move);
+            return true;
         }
 
         private void AutoRotate(){
