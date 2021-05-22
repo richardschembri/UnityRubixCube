@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 123003581591180422}
   - component: {fileID: 123003581591180421}
   m_Layer: 0
-  m_Name: FaceTop
+  m_Name: FaceUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -292,7 +292,7 @@ GameObject:
   - component: {fileID: 123003583026331158}
   - component: {fileID: 123003583026331157}
   m_Layer: 0
-  m_Name: FaceBottom
+  m_Name: FaceDown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -577,6 +577,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70c3f47e3d6b3afb1ab148034eaeca5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _faceUp: {fileID: 123003581591180420}
+  _faceDown: {fileID: 123003583026331156}
+  _faceLeft: {fileID: 123003581369869608}
+  _faceRight: {fileID: 123003583084031736}
+  _faceFront: {fileID: 123003583320176362}
+  _faceBack: {fileID: 123003582094059708}
 --- !u!1 &123003583320176362
 GameObject:
   m_ObjectHideFlags: 0

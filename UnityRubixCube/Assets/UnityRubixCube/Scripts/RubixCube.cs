@@ -9,6 +9,7 @@ namespace UnityRubixCube {
     {
         [SerializeField]
         private int _cubiesPerSide = 3;
+        public int CubiesPerSide {get {return _cubiesPerSide;}}
         private CubieSpawner _cubieSpawnerComponent;
 
         private Transform _rotatingLayer;

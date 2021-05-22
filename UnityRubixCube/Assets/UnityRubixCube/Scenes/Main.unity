@@ -245,7 +245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugMode: 0
   InitOnAwake: 1
-  _cubiesPerSide: 3
+  _cubiesPerSide: 6
 --- !u!114 &804754687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +264,8 @@ MonoBehaviour:
   SpawnParent: {fileID: 0}
   PoolSize: -1
   CollectChildrenAlreadyInScene: 1
-  GameObjectToSpawn: {fileID: 0}
+  GameObjectToSpawn: {fileID: 8706335677926459636, guid: cf0ff5d88f3af2cb0b77e0bc48dfbd6f,
+    type: 3}
 --- !u!4 &804754688
 Transform:
   m_ObjectHideFlags: 0
