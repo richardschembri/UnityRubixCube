@@ -5,6 +5,16 @@ using UnityEngine;
 namespace UnityRubixCube {
     public class Cubie : MonoBehaviour
     {
+        public struct CubieIndex{
+            public readonly int x;
+            public readonly int y; 
+            public readonly int z;
+            public CubieIndex(int x, int y, int z){
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+        }
         [SerializeField]
         private GameObject _faceUp;
         [SerializeField]
@@ -17,26 +27,35 @@ namespace UnityRubixCube {
         private GameObject _faceFront;
         [SerializeField]
         private GameObject _faceBack;
-        public Vector3 Index3D {get; private set;}
+        public CubieIndex Index {get; private set;}
 
         public RubixCube ParentCube {get; private set;}
 
-        public void SetValues(Vector3 index3D, Vector3 localPosition, Vector3 localScale){
+        public void SetValues(CubieIndex index, Vector3 localPosition, Vector3 localScale){
             ParentCube = transform.parent.GetComponent<RubixCube>();
-            Index3D = index3D;
+            Index = index;
             transform.localPosition = localPosition;
             transform.localScale = localScale;
-            name = $"Cubie(x:{index3D.x},y:{index3D.y},z:{index3D.z})";
+            RefreshName();
             ToggleFaces();
         }
 
         public void ToggleFaces(){
-            _faceBack.SetActive(Index3D.x == 0);
-            _faceFront.SetActive(Index3D.x == ParentCube.CubiesPerSide - 1);
-            _faceDown.SetActive(Index3D.y == 0);
-            _faceUp.SetActive(Index3D.y == ParentCube.CubiesPerSide - 1);
-            _faceRight.SetActive(Index3D.z == 0);
-            _faceLeft.SetActive(Index3D.z == ParentCube.CubiesPerSide - 1);
+            _faceBack.SetActive(Index.x == 0);
+            _faceFront.SetActive(Index.x == ParentCube.CubiesPerSide - 1);
+            _faceDown.SetActive(Index.y == 0);
+            _faceUp.SetActive(Index.y == ParentCube.CubiesPerSide - 1);
+            _faceRight.SetActive(Index.z == 0);
+            _faceLeft.SetActive(Index.z == ParentCube.CubiesPerSide - 1);
+        }
+
+        private void RefreshName(){
+            name = $"Cubie(x:{Index.x},y:{Index.y},z:{Index.z})";
+        }
+
+        public void RefreshIndex(){
+            Index = ParentCube.GetLocalPositionIndex(transform.localPosition);
+            RefreshName();
         }
 
         // Start is called before the first frame update

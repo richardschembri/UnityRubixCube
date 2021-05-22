@@ -34,11 +34,12 @@ namespace UnityRubixCube {
           }
           for(int i = 0; i < cubies.Length; i++){
               cubies[i].transform.parent = ParentCube.transform;
+              cubies[i].RefreshIndex();
           }
           return true;
         }
         private void CollectCubies(RubixCube.Move move){
-            float treshhold = 1f / ParentCube.CubiesPerSide * 0.5f;
+            float treshhold = ParentCube.GetTreshold();
             var allCubies = ParentCube.GetCubies();
             float distance = Mathf.Infinity;
             for(int i = 0; i < allCubies.Count; i++){
@@ -66,7 +67,11 @@ namespace UnityRubixCube {
         }
 
         float _step;
-        public bool MoveLayer(RubixCube.Move move){
+        public bool MoveLayer(RubixCube.Move move, bool isManual){
+            if(CurrentRotationState == ERotationState.MANUAL && isManual){
+                // ManualTurn
+                return true;
+            }
             if(CurrentRotationState != ERotationState.IDLE){
                 return false;
             }
@@ -74,7 +79,9 @@ namespace UnityRubixCube {
             transform.localRotation = Quaternion.Euler(Vector3.zero);
             transform.localPosition = move.GetMoveVector(true) * (scale * move.LayerIndex - 0.5f + (scale / 2f));
             CollectCubies(move);
-            TriggerAutoRotate(move);
+            if(!isManual){
+                TriggerAutoRotate(move);
+            }
             return true;
         }
 

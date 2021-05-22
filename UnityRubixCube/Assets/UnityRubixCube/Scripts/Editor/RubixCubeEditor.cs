@@ -29,9 +29,11 @@ namespace UnityRubixCube {
             EditorGUILayout.LabelField("Debug:", EditorStyles.largeLabel);
             GUILayout.BeginHorizontal();
             if(GUILayout.Button("Generate Cube")){
+                _targetLayerIndex = 0;
                 _targetRubixCube.GenerateCube();
             }
             if(GUILayout.Button("Clear Cube")){
+                _targetLayerIndex = 0;
                 _targetRubixCube.ClearCube();
             }
             GUILayout.EndHorizontal();
@@ -43,11 +45,11 @@ namespace UnityRubixCube {
             _targetAxis = (RubixCube.Move.EMoveAxis)EditorGUILayout.EnumPopup("Axis", _targetAxis);
             if (GUILayout.Button("<="))
             {
-                _targetRubixCube.MoveLayer(_targetLayerIndex, _targetAxis, false);
+                _targetRubixCube.MoveLayer(_targetLayerIndex, _targetAxis, false, false);
             }
             if (GUILayout.Button("=>"))
             {
-                _targetRubixCube.MoveLayer(_targetLayerIndex, _targetAxis, true);
+                _targetRubixCube.MoveLayer(_targetLayerIndex, _targetAxis, true, false);
             }
 
             GUILayout.EndHorizontal();

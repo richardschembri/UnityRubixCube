@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using RSToolkit;
+using RSToolkit.Collections;
 using System.Collections.ObjectModel;
 
 namespace UnityRubixCube {
@@ -45,6 +46,10 @@ namespace UnityRubixCube {
         [SerializeField]
         private RubixLayer _selectedLayer;
 
+        private int _layerMask = 1 << 8;
+
+        private LinkedList<Move> _moves = new LinkedList<Move>();
+
 
         #region RSMonoBehaviour Functions
         protected override void InitComponents()
@@ -56,7 +61,7 @@ namespace UnityRubixCube {
         #endregion RSMonoBehaviour Functions
 
         public void GenerateCube(){
-            _cubieSpawnerComponent.GenerateCube(_cubiesPerSide);
+            _cubieSpawnerComponent.GenerateCube();
         }
 
         public void ClearCube(){
@@ -71,11 +76,19 @@ namespace UnityRubixCube {
             return GetCubies().Count;
         }
 
-        public void MoveLayer(Move move){
-            _selectedLayer.MoveLayer(move);
+        public void MoveLayer(Move move, bool isManual){
+            _selectedLayer.MoveLayer(move, isManual);
         }
-        public void MoveLayer(int layerIndex, Move.EMoveAxis moveDirection,bool isPositive){
-            MoveLayer(new Move(layerIndex, moveDirection,isPositive));
+        public void MoveLayer(int layerIndex, Move.EMoveAxis moveDirection,bool isPositive, bool isManual){
+            MoveLayer(new Move(layerIndex, moveDirection,isPositive), isManual);
+        }
+
+        public float GetTreshold(){
+            return 1f / CubiesPerSide * 0.5f;
+        }
+
+        public Cubie.CubieIndex GetLocalPositionIndex(Vector3 localPosition){
+            return _cubieSpawnerComponent.GetLocalPositionIndex(localPosition);
         }
         // Start is called before the first frame update
         void Start()
@@ -86,11 +99,32 @@ namespace UnityRubixCube {
             GenerateCube();
         }
 
+        RaycastHit _mouseRaycastHit;
+        Ray _mouseRay;
+        Cubie _hitCubie = null;
+    
         // Update is called once per frame
         void Update()
         {
-            
+           // LogInDebugMode($"Mouse Input: {Input.mousePosition}");
+           if(!Input.GetMouseButtonDown(0)
+                || _selectedLayer.CurrentRotationState == RubixLayer.ERotationState.AUTO){
+               return;
+           } 
+
+            _mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            // LogInDebugMode($"Mouse Down Input: {Input.mousePosition}");
+            if(Physics.Raycast(_mouseRay, out _mouseRaycastHit, 100.0f, _layerMask)){
+                var hitParent = _mouseRaycastHit.collider.transform.parent; 
+                if(hitParent == null ){
+                    return;
+                }
+                _hitCubie = hitParent.GetComponent<Cubie>();
+                if(_hitCubie == null){
+                    return;
+                }
+            }
+           
         }
     }
-
 }
