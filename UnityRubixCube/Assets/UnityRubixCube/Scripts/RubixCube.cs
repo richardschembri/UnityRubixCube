@@ -12,6 +12,13 @@ namespace UnityRubixCube {
         public enum ERubixAxis{
             X, Y, Z
         }
+
+        public enum ECubeState{
+            IDLE,
+            CAMERA,
+            MANUAL,
+            AUTO
+        }
         public class Move{
             public int LayerIndex {get; private set;}
             public ERubixAxis MoveAxis {get; private set;}
@@ -22,6 +29,11 @@ namespace UnityRubixCube {
                 LayerIndex = layerIndex;
                 MoveAxis  = moveDirection;
                 IsPositive = isPositive;
+            }
+
+            public void Reverse(){
+
+                IsPositive = !IsPositive;
             }
 
             public Vector3 GetMoveVector(bool abs = false){
@@ -52,8 +64,18 @@ namespace UnityRubixCube {
 
         public Cubie SelectedCubie { get; private set; } = null;
 
+        [SerializeField]
+        private float _dragTreshold = 0.025f;
+        public float DragTreshold { get {return _dragTreshold;} }
+        [SerializeField]
+        private float _dragSensitivity = 0.4f;
+        public float DragSensitivity {get {return _dragSensitivity;}}
+        public bool IsCubieSelected(Cubie target){
+            return SelectedCubie != null && target.ParentCube == this;
+        }
+
         public bool SelectCubie(Cubie target){
-            if(SelectedCubie == null || target.ParentCube != this){
+            if(IsCubieSelected(target)){
                 return false;
             }
             SelectedCubie = target; 
@@ -61,7 +83,7 @@ namespace UnityRubixCube {
         }
 
         public bool DeselectCubie(Cubie target){
-            if(SelectedCubie != target || target.ParentCube != this){
+            if(!IsCubieSelected(target)){
                 return false;
             }
             SelectedCubie = null; 
@@ -86,6 +108,9 @@ namespace UnityRubixCube {
             return result;
         }
 
+        public ECubeState GetRotationState(){
+            return _selectedLayer.CurrentRotationState;
+        }
         #region RSMonoBehaviour Functions
         protected override void InitComponents()
         {
@@ -111,11 +136,19 @@ namespace UnityRubixCube {
             return GetCubies().Count;
         }
 
-        public void MoveLayer(Move move, bool isManual){
-            _selectedLayer.MoveLayer(move, isManual);
+        public void SetLayerMove(Move move){
+            _selectedLayer.SetLayerMove(move);
         }
-        public void MoveLayer(int layerIndex, ERubixAxis moveDirection,bool isPositive, bool isManual){
-            MoveLayer(new Move(layerIndex, moveDirection,isPositive), isManual);
+        public void SetLayerMove(int layerIndex, ERubixAxis moveDirection,bool isPositive){
+            SetLayerMove(new Move(layerIndex, moveDirection,isPositive));
+        }
+
+        public void TriggerAutoRotate(){
+            _selectedLayer.TriggerAutoRotate();
+        }
+
+        public void ManualRotate(float by){
+            _selectedLayer.ManualRotate(by);
         }
 
         public float GetTreshold(){

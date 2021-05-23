@@ -32,7 +32,8 @@ namespace UnityRubixCube {
         public RubixCube ParentCube {get; private set;}
 
         public void SetValues(CubieIndex index, Vector3 localPosition, Vector3 localScale){
-            ParentCube = transform.parent.GetComponent<RubixCube>();
+            ParentCube = transform.GetComponentInParent<RubixCube>();
+            Debug.Log($"ParentCube is {ParentCube.name}");
             Index = index;
             transform.localPosition = localPosition;
             transform.localScale = localScale;
@@ -62,8 +63,31 @@ namespace UnityRubixCube {
             return ParentCube.SelectCubie(this);
         }
 
-        
+        public bool DeselectCubie(){
+            return ParentCube.DeselectCubie(this);
+        }
 
+        public bool IsCubieSelected(){
+            return ParentCube.IsCubieSelected(this);
+        }
+        
+        public List<Cubie> GetNeighbours(){
+            return ParentCube.GetNeighbours(this);
+        }
+       private bool IsEdge(int index1D){
+           return index1D == 0 || index1D == ParentCube.CubiesPerSide - 1;
+       } 
+        public bool IsEdge(RubixCube.ERubixAxis axis){
+            switch (axis){
+                case RubixCube.ERubixAxis.X:
+                    return IsEdge(Index.x); 
+                case RubixCube.ERubixAxis.Y:
+                    return IsEdge(Index.y); 
+                case RubixCube.ERubixAxis.Z:
+                    return IsEdge(Index.z); 
+            }
+            return false;
+        }
         // Start is called before the first frame update
         void Start()
         {

@@ -235,6 +235,16 @@ PrefabInstance:
       propertyPath: DebugMode
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1988804764990624265, guid: 7fefc556bba8ccfa3880e2643d51a204,
+        type: 3}
+      propertyPath: _dragTreshold
+      value: 0.025
+      objectReference: {fileID: 0}
+    - target: {fileID: 1988804764990624265, guid: 7fefc556bba8ccfa3880e2643d51a204,
+        type: 3}
+      propertyPath: _dragSensitivity
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1988804764990624266, guid: 7fefc556bba8ccfa3880e2643d51a204,
         type: 3}
       propertyPath: m_Name

@@ -6,15 +6,11 @@ using RSToolkit;
 namespace UnityRubixCube {
     public class RubixLayer : RSMonoBehaviour
     {
-        public enum ERotationState{
-            IDLE,
-            MANUAL,
-            AUTO
-        }
 
-        public ERotationState CurrentRotationState{get; private set;} = ERotationState.IDLE;
+        public RubixCube.ECubeState CurrentRotationState{get; private set;} = RubixCube.ECubeState.IDLE;
         public RubixCube ParentCube {get; private set;}
         Quaternion _targetRotation;
+        RubixCube.Move _targetMove = null;
 
         [SerializeField]
         private float _speed = 300f;
@@ -38,12 +34,12 @@ namespace UnityRubixCube {
           }
           return true;
         }
-        private void CollectCubies(RubixCube.Move move){
+        private void CollectCubies(){
             float treshhold = ParentCube.GetTreshold();
             var allCubies = ParentCube.GetCubies();
             float distance = Mathf.Infinity;
             for(int i = 0; i < allCubies.Count; i++){
-                switch(move.MoveAxis){
+                switch(_targetMove.MoveAxis){
                     case RubixCube.ERubixAxis.X:
                     distance = allCubies[i].transform.localPosition.x - transform.localPosition.x;
                     break;
@@ -61,28 +57,31 @@ namespace UnityRubixCube {
             }
         }
 
-        public void TriggerAutoRotate(RubixCube.Move move){
-            _targetRotation = Quaternion.Euler(move.GetMoveVector() * 90);
-            CurrentRotationState = ERotationState.AUTO;
+        public void TriggerAutoRotate(){
+            CurrentRotationState = RubixCube.ECubeState.AUTO;
         }
 
         float _step;
-        public bool MoveLayer(RubixCube.Move move, bool isManual){
-            if(CurrentRotationState == ERotationState.MANUAL && isManual){
-                // ManualTurn
-                return true;
-            }
-            if(CurrentRotationState != ERotationState.IDLE){
+        public bool SetLayerMove(RubixCube.Move move){
+            if(CurrentRotationState != RubixCube.ECubeState.IDLE){
                 return false;
             }
+            _targetMove = move;
             float scale = 1f / ParentCube.CubiesPerSide;
             transform.localRotation = Quaternion.Euler(Vector3.zero);
             transform.localPosition = move.GetMoveVector(true) * (scale * move.LayerIndex - 0.5f + (scale / 2f));
-            CollectCubies(move);
-            if(!isManual){
-                TriggerAutoRotate(move);
-            }
+            CollectCubies();
             return true;
+        }
+
+        public void ManualRotate(float by){
+            CurrentRotationState = RubixCube.ECubeState.MANUAL;
+            _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector() * 90);
+
+            Debug.Log($"{by * ParentCube.DragSensitivity}");
+            if(Quaternion.Angle(transform.localRotation, _targetRotation) > 1){
+                transform.localRotation =  Quaternion.Euler(_targetMove.GetMoveVector() * by * ParentCube.DragSensitivity);
+            }
         }
 
         private void AutoRotate(){
@@ -91,7 +90,7 @@ namespace UnityRubixCube {
 
             if(Quaternion.Angle(transform.localRotation, _targetRotation) <= 1){
                 transform.localRotation = _targetRotation;
-                CurrentRotationState = ERotationState.IDLE;
+                CurrentRotationState = RubixCube.ECubeState.IDLE;
                 ReleaseCubies();
             }
         }
@@ -106,7 +105,7 @@ namespace UnityRubixCube {
         // Update is called once per frame
         void Update()
         {
-            if(CurrentRotationState == ERotationState.AUTO){
+            if(CurrentRotationState == RubixCube.ECubeState.AUTO){
                 AutoRotate();
             }
         }
