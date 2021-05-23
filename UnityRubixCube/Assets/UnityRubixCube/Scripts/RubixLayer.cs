@@ -58,6 +58,10 @@ namespace UnityRubixCube {
         }
 
         public void TriggerAutoRotate(){
+
+            if(Quaternion.Angle(transform.localRotation, _targetRotation) > 90){
+                _targetMove.Reverse();
+            }
             CurrentRotationState = RubixCube.ECubeState.AUTO;
         }
 
@@ -79,9 +83,9 @@ namespace UnityRubixCube {
             _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector() * 90);
 
             Debug.Log($"{by * ParentCube.DragSensitivity}");
-            if(Quaternion.Angle(transform.localRotation, _targetRotation) > 1){
+            //if(Quaternion.Angle(transform.localRotation, _targetRotation) > 1){
                 transform.localRotation =  Quaternion.Euler(_targetMove.GetMoveVector() * by * ParentCube.DragSensitivity);
-            }
+            //}
         }
 
         private void AutoRotate(){
