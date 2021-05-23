@@ -10,7 +10,7 @@ namespace UnityRubixCube {
     {
         private RubixCube _targetRubixCube;
         private int _targetLayerIndex = 0;
-        private RubixCube.Move.EMoveAxis _targetAxis = RubixCube.Move.EMoveAxis.X;
+        private RubixCube.ERubixAxis _targetAxis = RubixCube.ERubixAxis.X;
 
         void OnEnable()
         {
@@ -42,7 +42,7 @@ namespace UnityRubixCube {
             _targetLayerIndex = (int)EditorGUILayout.Slider("Layer Index", _targetLayerIndex , 0f, _targetRubixCube.CubiesPerSide - 1);
 
             GUILayout.BeginHorizontal();
-            _targetAxis = (RubixCube.Move.EMoveAxis)EditorGUILayout.EnumPopup("Axis", _targetAxis);
+            _targetAxis = (RubixCube.ERubixAxis)EditorGUILayout.EnumPopup("Axis", _targetAxis);
             if (GUILayout.Button("<="))
             {
                 _targetRubixCube.MoveLayer(_targetLayerIndex, _targetAxis, false, false);

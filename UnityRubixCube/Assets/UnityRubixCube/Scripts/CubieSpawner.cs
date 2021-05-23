@@ -18,7 +18,7 @@ namespace UnityRubixCube {
             ParentCube = GetComponent<RubixCube>();
         }
 
-        private bool isEdge(int axisIndex){
+        private bool isInner(int axisIndex){
             return axisIndex > 0 && axisIndex < ParentCube.CubiesPerSide - 1;
         }
         public bool GenerateCube(){
@@ -34,7 +34,7 @@ namespace UnityRubixCube {
             for(int x = 0; x < ParentCube.CubiesPerSide; x++){
                 for(int y = 0; y < ParentCube.CubiesPerSide; y++){
                     for(int z = 0; z < ParentCube.CubiesPerSide; z++){
-                        if(isEdge(x) && isEdge(y) && isEdge(z)){
+                        if(isInner(x) && isInner(y) && isInner(z)){
                             // Do not spawn inner cubies
                             continue;
                         }

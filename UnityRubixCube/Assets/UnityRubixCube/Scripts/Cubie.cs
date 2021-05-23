@@ -58,6 +58,12 @@ namespace UnityRubixCube {
             RefreshName();
         }
 
+        public bool SelectCubie(){
+            return ParentCube.SelectCubie(this);
+        }
+
+        
+
         // Start is called before the first frame update
         void Start()
         {

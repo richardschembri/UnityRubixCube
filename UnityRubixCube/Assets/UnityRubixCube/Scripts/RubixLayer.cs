@@ -44,13 +44,13 @@ namespace UnityRubixCube {
             float distance = Mathf.Infinity;
             for(int i = 0; i < allCubies.Count; i++){
                 switch(move.MoveAxis){
-                    case RubixCube.Move.EMoveAxis.X:
+                    case RubixCube.ERubixAxis.X:
                     distance = allCubies[i].transform.localPosition.x - transform.localPosition.x;
                     break;
-                    case RubixCube.Move.EMoveAxis.Y:
+                    case RubixCube.ERubixAxis.Y:
                     distance = allCubies[i].transform.localPosition.y - transform.localPosition.y;
                     break;
-                    case RubixCube.Move.EMoveAxis.Z:
+                    case RubixCube.ERubixAxis.Z:
                     distance = allCubies[i].transform.localPosition.z - transform.localPosition.z;
                     break;
                 }

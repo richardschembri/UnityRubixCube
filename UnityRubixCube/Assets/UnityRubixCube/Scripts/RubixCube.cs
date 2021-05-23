@@ -9,16 +9,16 @@ namespace UnityRubixCube {
     [RequireComponent(typeof(CubieSpawner))]
     public class RubixCube : RSMonoBehaviour
     {
+        public enum ERubixAxis{
+            X, Y, Z
+        }
         public class Move{
-            public enum EMoveAxis{
-                X, Y, Z
-            }
             public int LayerIndex {get; private set;}
-            public EMoveAxis MoveAxis {get; private set;}
+            public ERubixAxis MoveAxis {get; private set;}
 
             public bool IsPositive {get; private set;}
 
-            public Move(int layerIndex, EMoveAxis moveDirection,bool isPositive){
+            public Move(int layerIndex, ERubixAxis  moveDirection,bool isPositive){
                 LayerIndex = layerIndex;
                 MoveAxis  = moveDirection;
                 IsPositive = isPositive;
@@ -26,11 +26,11 @@ namespace UnityRubixCube {
 
             public Vector3 GetMoveVector(bool abs = false){
                 switch (MoveAxis){
-                    case EMoveAxis.X:
+                    case ERubixAxis.X:
                         return abs || IsPositive ? Vector3.right : Vector3.left;
-                    case EMoveAxis.Y:
+                    case ERubixAxis.Y:
                         return abs || IsPositive ? Vector3.up : Vector3.down;
-                    case EMoveAxis.Z:
+                    case ERubixAxis.Z:
                         return abs || IsPositive ? Vector3.forward : Vector3.back;
                 }
 
@@ -50,6 +50,41 @@ namespace UnityRubixCube {
 
         private LinkedList<Move> _moves = new LinkedList<Move>();
 
+        public Cubie SelectedCubie { get; private set; } = null;
+
+        public bool SelectCubie(Cubie target){
+            if(SelectedCubie == null || target.ParentCube != this){
+                return false;
+            }
+            SelectedCubie = target; 
+            return true;
+        }
+
+        public bool DeselectCubie(Cubie target){
+            if(SelectedCubie != target || target.ParentCube != this){
+                return false;
+            }
+            SelectedCubie = null; 
+            return true;
+        }
+        private bool IsNeighbourIndex(int a, int b){
+            return Mathf.Abs(a - b) <= 1;
+        }
+        public List<Cubie> GetNeighbours(Cubie target){
+            var cubies = GetCubies();
+            var result = new List<Cubie>();
+            for(int i = 0; i < cubies.Count; i++){
+                if(cubies[i] == target){
+                    continue;
+                }
+                if(IsNeighbourIndex(target.Index.x, cubies[i].Index.x)
+                    && IsNeighbourIndex(target.Index.y, cubies[i].Index.y)
+                    && IsNeighbourIndex(target.Index.z, cubies[i].Index.z)){
+                        result.Add(cubies[i]);
+                    }
+            }
+            return result;
+        }
 
         #region RSMonoBehaviour Functions
         protected override void InitComponents()
@@ -79,7 +114,7 @@ namespace UnityRubixCube {
         public void MoveLayer(Move move, bool isManual){
             _selectedLayer.MoveLayer(move, isManual);
         }
-        public void MoveLayer(int layerIndex, Move.EMoveAxis moveDirection,bool isPositive, bool isManual){
+        public void MoveLayer(int layerIndex, ERubixAxis moveDirection,bool isPositive, bool isManual){
             MoveLayer(new Move(layerIndex, moveDirection,isPositive), isManual);
         }
 
@@ -89,6 +124,18 @@ namespace UnityRubixCube {
 
         public Cubie.CubieIndex GetLocalPositionIndex(Vector3 localPosition){
             return _cubieSpawnerComponent.GetLocalPositionIndex(localPosition);
+        }
+
+        public bool IsSolved(){
+            var cubies = GetCubies();
+            var compare = cubies[0];
+            for(int i = 1; i < cubies.Count; i++){
+                if(compare.transform.localRotation != cubies[i].transform.localRotation){
+                    return false;
+                }
+                compare = cubies[i];
+            }
+            return true;
         }
         // Start is called before the first frame update
         void Start()
@@ -106,16 +153,19 @@ namespace UnityRubixCube {
         // Update is called once per frame
         void Update()
         {
+            /*
            // LogInDebugMode($"Mouse Input: {Input.mousePosition}");
            if(!Input.GetMouseButtonDown(0)
                 || _selectedLayer.CurrentRotationState == RubixLayer.ERotationState.AUTO){
                return;
            } 
 
+            LogInDebugMode($"click");
             _mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             // LogInDebugMode($"Mouse Down Input: {Input.mousePosition}");
-            if(Physics.Raycast(_mouseRay, out _mouseRaycastHit, 100.0f, _layerMask)){
+            if(Physics.Raycast(_mouseRay, out _mouseRaycastHit, 500.0f, _layerMask)){
                 var hitParent = _mouseRaycastHit.collider.transform.parent; 
+            LogInDebugMode($"Hit object: {_mouseRaycastHit.collider.transform.name }");
                 if(hitParent == null ){
                     return;
                 }
@@ -123,7 +173,9 @@ namespace UnityRubixCube {
                 if(_hitCubie == null){
                     return;
                 }
+            LogInDebugMode($"Hit cubie: {_hitCubie.gameObject.name }");
             }
+            */
            
         }
     }
