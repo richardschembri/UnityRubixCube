@@ -23,27 +23,27 @@ namespace UnityRubixCube {
             public int LayerIndex {get; private set;}
             public ERubixAxis MoveAxis {get; private set;}
 
-            public bool IsPositive {get; private set;}
+            public bool Clockwise {get; private set;}
 
-            public Move(int layerIndex, ERubixAxis  moveDirection,bool isPositive){
+            public Move(int layerIndex, ERubixAxis  moveDirection,bool clockwise){
                 LayerIndex = layerIndex;
                 MoveAxis  = moveDirection;
-                IsPositive = isPositive;
+                Clockwise = clockwise;
             }
 
             public void Reverse(){
 
-                IsPositive = !IsPositive;
+                Clockwise = !Clockwise;
             }
 
             public Vector3 GetMoveVector(bool abs = false){
                 switch (MoveAxis){
                     case ERubixAxis.X:
-                        return abs || IsPositive ? Vector3.right : Vector3.left;
+                        return abs || Clockwise ? Vector3.right : Vector3.left;
                     case ERubixAxis.Y:
-                        return abs || IsPositive ? Vector3.up : Vector3.down;
+                        return abs || Clockwise ? Vector3.up : Vector3.down;
                     case ERubixAxis.Z:
-                        return abs || IsPositive ? Vector3.forward : Vector3.back;
+                        return abs || Clockwise ? Vector3.forward : Vector3.back;
                 }
 
                 return Vector3.zero;
@@ -53,7 +53,7 @@ namespace UnityRubixCube {
 
         [SerializeField]
         private int _cubiesPerSide = 3;
-        public int CubiesPerSide {get {return _cubiesPerSide;}}
+        public int CubiesPerSide {get {return _cubiesPerSide;} private set{_cubiesPerSide = value;}}
         private CubieSpawner _cubieSpawnerComponent;
         [SerializeField]
         private RubixLayer _selectedLayer;
@@ -123,6 +123,10 @@ namespace UnityRubixCube {
         public void GenerateCube(){
             _cubieSpawnerComponent.GenerateCube();
         }
+        public void GenerateCube(int cubiesPerSide){
+            CubiesPerSide = cubiesPerSide;
+            GenerateCube();
+        }
 
         public void ClearCube(){
             _cubieSpawnerComponent.DestroyAllSpawns();
@@ -136,19 +140,20 @@ namespace UnityRubixCube {
             return GetCubies().Count;
         }
 
-        public void SetLayerMove(Move move){
-            _selectedLayer.SetLayerMove(move);
+        public bool SetLayerMove(Move move){
+            return _selectedLayer.SetLayerMove(move);
         }
-        public void SetLayerMove(int layerIndex, ERubixAxis moveDirection,bool isPositive){
-            SetLayerMove(new Move(layerIndex, moveDirection,isPositive));
-        }
-
-        public void TriggerAutoRotate(){
-            _selectedLayer.TriggerAutoRotate();
+        public bool SetLayerMove(int layerIndex, ERubixAxis moveDirection,bool clockwise){
+            return SetLayerMove(new Move(layerIndex, moveDirection,clockwise));
         }
 
-        public void ManualRotate(float by){
-            _selectedLayer.ManualRotate(by);
+        public bool TriggerAutoRotate(){
+            LogInDebugMode("TriggerAutoRotate");
+            return _selectedLayer.TriggerAutoRotate();
+        }
+
+        public bool ManualRotate(float by){
+            return _selectedLayer.ManualRotate(by);
         }
 
         public float GetTreshold(){
@@ -169,14 +174,6 @@ namespace UnityRubixCube {
                 compare = cubies[i];
             }
             return true;
-        }
-        // Start is called before the first frame update
-        void Start()
-        {
-            if(!Initialized){
-                return;
-            }
-            GenerateCube();
         }
 
         RaycastHit _mouseRaycastHit;

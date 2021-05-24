@@ -22,6 +22,8 @@ namespace UnityRubixCube {
         Cubie _closestCubie;
         Vector3 _mouseWorldPoint;
 
+        public bool IsMouseOver {get; private set;}= false;
+
         float _dragDistance;
 
         protected override void InitComponents()
@@ -48,6 +50,13 @@ namespace UnityRubixCube {
         }
 
         #region Mouse Events
+
+        void OnMouseOver(){
+            IsMouseOver = true;
+        }
+        void OnMouseExit(){
+            IsMouseOver = false;
+        }
         void OnMouseDown()
         {
             if(!ParentCubie.SelectCubie()){
@@ -93,19 +102,34 @@ namespace UnityRubixCube {
                     return;
             }
 
+            /*
             _closestCubie = _cubieNeighbours[0];
             _mouseWorldPoint = GetMouseAsWorldPoint(Input.mousePosition) + _offset;
             for(int i = 1; i < _cubieNeighbours.Count; i++){
                if(Vector3.Distance(_cubieNeighbours[i].transform.position, _mouseWorldPoint) < 
-                   Vector3.Distance(_closestCubie.transform.position, _mouseWorldPoint)  
-                ) {
+                   Vector3.Distance(_closestCubie.transform.position, _mouseWorldPoint))
+                {
                     _closestCubie = _cubieNeighbours[i];
-               }
+                    break;
+                }
+            }
+            */
+            _closestCubie = null;
+            for(int i = 0; i < _cubieNeighbours.Count; i++){
+                if(_cubieNeighbours[i].IsMouseOver())
+                {
+                    _closestCubie = _cubieNeighbours[i];
+                    break;
+                }
+            }
+            if(_closestCubie == null){
+                return;
             }
 
             int xDiff = _closestCubie.Index.x - ParentCubie.Index.x;
             int yDiff = _closestCubie.Index.y - ParentCubie.Index.y;
             int zDiff = _closestCubie.Index.z - ParentCubie.Index.z;
+            /*
             if(!ParentCubie.IsEdge(RubixCube.ERubixAxis.X) && _closestCubie.Index.x == ParentCubie.Index.x){
                 if(_closestCubie.Index.y == ParentCubie.Index.y){
                     ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, zDiff > 0);
@@ -125,16 +149,28 @@ namespace UnityRubixCube {
                     Debug.Log("Set　Layer Move");
                 }
             }
-            /*
-            if(_closestCubie.Index.x == ParentCubie.Index.x){
-                ParentCubie.ParentCube.MoveLayer(ParentCubie.Index.x, RubixCube.ERubixAxis.X, zDiff > 0, false);
-            }else if(_closestCubie.Index.y == ParentCubie.Index.y){
-                ParentCubie.ParentCube.MoveLayer(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, zDiff > 0, false);
-            }else if(_closestCubie.Index.z == ParentCubie.Index.z){
-                ParentCubie.ParentCube.MoveLayer(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, xDiff > 0, false);
-            }
-            Debug.Log($"Closest Cubie {_closestCubie.transform.name} to {ParentCubie.gameObject.name}");
             */
+            if(_closestCubie.Index.x == ParentCubie.Index.x && _closestCubie.Index.y == ParentCubie.Index.y){
+                if(ParentCubie.IsEdge(RubixCube.ERubixAxis.Y)){
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, zDiff > 0);
+                }else{
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, zDiff > 0);
+                }
+            }else if(_closestCubie.Index.y == ParentCubie.Index.y && _closestCubie.Index.z == ParentCubie.Index.z){
+                if(ParentCubie.IsEdge(RubixCube.ERubixAxis.Y)){
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, -xDiff > 0);
+                }else{
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, xDiff > 0);
+                }
+            }else if(_closestCubie.Index.z == ParentCubie.Index.z && _closestCubie.Index.x == ParentCubie.Index.x){
+                if(ParentCubie.IsEdge(RubixCube.ERubixAxis.X)){
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, -yDiff  > 0);
+                }else if(ParentCubie.IsEdge(RubixCube.ERubixAxis.Z)){
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, (ParentCubie.Index.z == 0 ? -yDiff : yDiff) > 0);
+                }
+            }
+                ParentCubie.ParentCube.ManualRotate(0f);
+            Debug.Log($"Closest Cubie {_closestCubie.transform.name} to {ParentCubie.gameObject.name}");
 
         }
 

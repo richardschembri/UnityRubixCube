@@ -11,6 +11,8 @@ namespace UnityRubixCube {
         public RubixCube ParentCube {get; private set;}
         Quaternion _targetRotation;
         RubixCube.Move _targetMove = null;
+        [SerializeField]
+        Transform Visualizer;
 
         [SerializeField]
         private float _speed = 300f;
@@ -57,12 +59,15 @@ namespace UnityRubixCube {
             }
         }
 
-        public void TriggerAutoRotate(){
-
+        public bool TriggerAutoRotate(){
+            if ( CurrentRotationState == RubixCube.ECubeState.AUTO){
+                return false;
+            }
             if(Quaternion.Angle(transform.localRotation, _targetRotation) > 90){
                 _targetMove.Reverse();
             }
             CurrentRotationState = RubixCube.ECubeState.AUTO;
+            return true;
         }
 
         float _step;
@@ -74,18 +79,33 @@ namespace UnityRubixCube {
             float scale = 1f / ParentCube.CubiesPerSide;
             transform.localRotation = Quaternion.Euler(Vector3.zero);
             transform.localPosition = move.GetMoveVector(true) * (scale * move.LayerIndex - 0.5f + (scale / 2f));
+            switch(move.MoveAxis){
+                case RubixCube.ERubixAxis.X:
+                    Visualizer.localScale = new Vector3(0.01f, 1.25f, 1.25f);
+                    break;
+                case RubixCube.ERubixAxis.Z:
+                    Visualizer.localScale = new Vector3(1.25f, 1.25f, 0.01f);
+                    break;
+                case RubixCube.ERubixAxis.Y:
+                    Visualizer.localScale = new Vector3(1.25f, 0.01f, 1.25f);
+                    break;
+            }
+            Visualizer.gameObject.SetActive(true);
             CollectCubies();
             return true;
         }
 
-        public void ManualRotate(float by){
+        public bool ManualRotate(float by){
+            if(_targetMove == null){
+                return false;
+            }
             CurrentRotationState = RubixCube.ECubeState.MANUAL;
             _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector() * 90);
 
-            Debug.Log($"{by * ParentCube.DragSensitivity}");
             //if(Quaternion.Angle(transform.localRotation, _targetRotation) > 1){
                 transform.localRotation =  Quaternion.Euler(_targetMove.GetMoveVector() * by * ParentCube.DragSensitivity);
             //}
+            return true;
         }
 
         private void AutoRotate(){
@@ -95,6 +115,8 @@ namespace UnityRubixCube {
             if(Quaternion.Angle(transform.localRotation, _targetRotation) <= 1){
                 transform.localRotation = _targetRotation;
                 CurrentRotationState = RubixCube.ECubeState.IDLE;
+
+                Visualizer.gameObject.SetActive(false);
                 ReleaseCubies();
             }
         }

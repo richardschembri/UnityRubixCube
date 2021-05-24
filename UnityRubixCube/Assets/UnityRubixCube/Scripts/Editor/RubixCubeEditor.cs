@@ -45,13 +45,15 @@ namespace UnityRubixCube {
             _targetAxis = (RubixCube.ERubixAxis)EditorGUILayout.EnumPopup("Axis", _targetAxis);
             if (GUILayout.Button("<="))
             {
-                _targetRubixCube.SetLayerMove(_targetLayerIndex, _targetAxis, false);
-                _targetRubixCube.TriggerAutoRotate();
+                if(_targetRubixCube.SetLayerMove(_targetLayerIndex, _targetAxis, false)){
+                    _targetRubixCube.TriggerAutoRotate();
+                }
             }
             if (GUILayout.Button("=>"))
             {
-                _targetRubixCube.SetLayerMove(_targetLayerIndex, _targetAxis, true);
-                _targetRubixCube.TriggerAutoRotate();
+                if(_targetRubixCube.SetLayerMove(_targetLayerIndex, _targetAxis, true)){
+                    _targetRubixCube.TriggerAutoRotate();
+                }
             }
 
             GUILayout.EndHorizontal();

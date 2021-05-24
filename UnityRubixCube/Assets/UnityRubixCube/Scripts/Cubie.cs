@@ -16,17 +16,17 @@ namespace UnityRubixCube {
             }
         }
         [SerializeField]
-        private GameObject _faceUp;
+        private CubieFace _faceUp;
         [SerializeField]
-        private GameObject _faceDown;
+        private CubieFace _faceDown;
         [SerializeField]
-        private GameObject _faceLeft;
+        private CubieFace _faceLeft;
         [SerializeField]
-        private GameObject _faceRight;
+        private CubieFace _faceRight;
         [SerializeField]
-        private GameObject _faceFront;
+        private CubieFace _faceFront;
         [SerializeField]
-        private GameObject _faceBack;
+        private CubieFace _faceBack;
         public CubieIndex Index {get; private set;}
 
         public RubixCube ParentCube {get; private set;}
@@ -42,12 +42,12 @@ namespace UnityRubixCube {
         }
 
         public void ToggleFaces(){
-            _faceBack.SetActive(Index.x == 0);
-            _faceFront.SetActive(Index.x == ParentCube.CubiesPerSide - 1);
-            _faceDown.SetActive(Index.y == 0);
-            _faceUp.SetActive(Index.y == ParentCube.CubiesPerSide - 1);
-            _faceRight.SetActive(Index.z == 0);
-            _faceLeft.SetActive(Index.z == ParentCube.CubiesPerSide - 1);
+            _faceBack.gameObject.SetActive(Index.x == 0);
+            _faceFront.gameObject.SetActive(Index.x == ParentCube.CubiesPerSide - 1);
+            _faceDown.gameObject.SetActive(Index.y == 0);
+            _faceUp.gameObject.SetActive(Index.y == ParentCube.CubiesPerSide - 1);
+            _faceRight.gameObject.SetActive(Index.z == 0);
+            _faceLeft.gameObject.SetActive(Index.z == ParentCube.CubiesPerSide - 1);
         }
 
         private void RefreshName(){
@@ -88,10 +88,19 @@ namespace UnityRubixCube {
             }
             return false;
         }
+
+        public bool IsMouseOver(){
+            return _faceUp.IsMouseOver ||
+            _faceDown.IsMouseOver ||
+            _faceLeft.IsMouseOver ||
+            _faceRight.IsMouseOver ||
+            _faceFront.IsMouseOver ||
+            _faceBack.IsMouseOver; 
+        }
         // Start is called before the first frame update
         void Start()
         {
-            
+
         }
 
         // Update is called once per frame
