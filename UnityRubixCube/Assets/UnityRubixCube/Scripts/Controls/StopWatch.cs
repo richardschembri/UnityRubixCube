@@ -7,8 +7,13 @@ using UnityEngine.UI;
 namespace UnityRubixCube.Controls {
     public class StopWatch : MonoBehaviour
     {
+		public enum EStopWatchState{
+			STOPPED,
+			PAUSED,
+			RUNNING
+		}
+		public EStopWatchState CurrentState {get; private set;} = EStopWatchState.STOPPED;
         private Text _textComponent;
-        public bool IsRunning{get; private set;} = false;
         private float _elapsedSeconds;
 
         [SerializeField]
@@ -29,7 +34,7 @@ namespace UnityRubixCube.Controls {
 
         void Update()
         {
-            if (!IsRunning) return;
+            if (CurrentState != EStopWatchState.RUNNING) return;
 
             _elapsedSeconds += Time.deltaTime;
             var timeSpan = TimeSpan.FromSeconds(_elapsedSeconds);
@@ -38,8 +43,11 @@ namespace UnityRubixCube.Controls {
 
         public void StartTimer()
         {
-            IsRunning = true;
+            CurrentState = EStopWatchState.RUNNING;
         }
+		public void PauseTimer(){
+            CurrentState = EStopWatchState.PAUSED;
+		}
 
         public void ResetTimer()
         {
@@ -48,7 +56,8 @@ namespace UnityRubixCube.Controls {
 
         public void StopTimer()
         {
-            IsRunning = false;
+            CurrentState = EStopWatchState.STOPPED;
+            ResetTimer();
         }
     }
 }

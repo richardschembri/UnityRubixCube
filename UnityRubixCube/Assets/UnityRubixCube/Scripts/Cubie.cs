@@ -33,7 +33,6 @@ namespace UnityRubixCube {
 
         public void SetValues(CubieIndex index, Vector3 localPosition, Vector3 localScale){
             ParentCube = transform.GetComponentInParent<RubixCube>();
-            Debug.Log($"ParentCube is {ParentCube.name}");
             Index = index;
             transform.localPosition = localPosition;
             transform.localScale = localScale;

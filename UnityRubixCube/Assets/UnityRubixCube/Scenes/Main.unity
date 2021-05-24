@@ -514,7 +514,7 @@ Transform:
   m_Children:
   - {fileID: 1536680299}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: -20, y: 45, z: -20}
 --- !u!1 &78026869
 GameObject:
@@ -878,6 +878,7 @@ GameObject:
   - component: {fileID: 482491732}
   - component: {fileID: 482491734}
   - component: {fileID: 482491733}
+  - component: {fileID: 482491735}
   m_Layer: 5
   m_Name: Stop Watch
   m_TagString: Untagged
@@ -942,6 +943,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 482491731}
   m_CullTransparentMesh: 0
+--- !u!225 &482491735
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 482491731}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &483165830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1188,7 +1201,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2108818060}
-        m_MethodName: StartGame
+        m_MethodName: RestartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1399,7 +1412,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &724931913
 GameObject:
@@ -2190,7 +2203,7 @@ GameObject:
   - component: {fileID: 1083939644}
   - component: {fileID: 1083939643}
   m_Layer: 5
-  m_Name: Cancel Button
+  m_Name: Back Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2259,9 +2272,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1342653157}
-        m_MethodName: ClosePopup
-        m_Mode: 6
+      - m_Target: {fileID: 2108818060}
+        m_MethodName: BackPauseMenu
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3043,7 +3056,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2108818060}
-        m_MethodName: StartGame
+        m_MethodName: RestartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3154,7 +3167,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1515521934
 GameObject:
@@ -3638,7 +3651,7 @@ RectTransform:
   - {fileID: 1342653156}
   - {fileID: 1580410192}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3804,7 +3817,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: CANCEL
+  m_Text: BACK
 --- !u!222 &1655641268
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4102,7 +4115,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1926189796}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2108818060}
+        m_MethodName: QuitGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1926189796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4297,7 +4321,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2108818060}
-        m_MethodName: StartGame
+        m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4477,8 +4501,11 @@ MonoBehaviour:
   DebugMode: 0
   InitOnAwake: 1
   _sizeSlider: {fileID: 1654767829}
+  _timerToggle: {fileID: 502400360}
   _rubixCube: {fileID: 1536680297}
   _mainMenu: {fileID: 5116369454555455101}
+  _pauseMenu: {fileID: 1342653157}
+  _congratsMenu: {fileID: 1580410193}
   _stopWatch: {fileID: 825575022}
 --- !u!4 &2108818061
 Transform:
@@ -4492,7 +4519,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2145044413
 GameObject:
