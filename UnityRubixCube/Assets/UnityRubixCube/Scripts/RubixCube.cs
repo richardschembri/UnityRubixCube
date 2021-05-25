@@ -1,17 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using RSToolkit;
-using RSToolkit.Collections;
 using System.Collections.ObjectModel;
 using UnityRubixCube.Utils;
+using RSToolkit.Helpers;
 
 namespace UnityRubixCube {
     [RequireComponent(typeof(CubieSpawner))]
     public class RubixCube : RSMonoBehaviour
     {
         public enum ERubixAxis{
-            X, Y, Z
+            X = 0, Y = 1, Z = 2
         }
 
         public enum ECubeState{
@@ -19,6 +18,7 @@ namespace UnityRubixCube {
             MANUAL = 1,
             AUTO = 2
         }
+
         public class Move{
             public int LayerIndex {get; private set;}
             public ERubixAxis MoveAxis {get; private set;}
@@ -75,6 +75,18 @@ namespace UnityRubixCube {
         [SerializeField]
         private float _dragSensitivity = 0.4f;
         public float DragSensitivity {get {return _dragSensitivity;}}
+
+        private int _shuffles = 0;
+
+        public bool IsShuffleing{
+            get{
+                return CanShuffle() && _shuffles > 0;
+            }
+        }
+
+        public bool CanShuffle(){
+            return _moves.Count <= 0;
+        }
 
         public bool IsCubieSelected(Cubie target){
             return SelectedCubie != null && target.ParentCube == this;
@@ -140,10 +152,15 @@ namespace UnityRubixCube {
 
         #region Events
         private void SelectedLayerOnMovePerformed_Listener(Move move, bool isUndo){
-            if(isUndo){
-                _moves.RemoveLast();
+            if(!IsShuffleing){
+                if(isUndo){
+                    _moves.RemoveLast();
+                }else{
+                    _moves.AddLast(move);
+                }
             }else{
-                _moves.AddLast(move);
+                _shuffles--;
+                ShuffleStep();
             }
         }
         #endregion Events
@@ -191,6 +208,24 @@ namespace UnityRubixCube {
         }
         public bool SetLayerMove(int layerIndex, ERubixAxis moveDirection,bool clockwise){
             return SetLayerMove(new Move(layerIndex, moveDirection,clockwise));
+        }
+
+        public bool SetRandomLayerMove(){
+            return SetLayerMove(RandomHelpers.RandomInt(CubiesPerSide),(ERubixAxis)RandomHelpers.RandomInt(3), RandomHelpers.RandomBool());
+        }
+
+        private void ShuffleStep(){
+            SetRandomLayerMove();
+            TriggerAutoRotate();
+        }
+
+        public bool Shuffle(int shuffles){
+            if(!CanShuffle() || GetCubeState() != ECubeState.IDLE){
+                return false;
+            }
+            _shuffles = shuffles;
+            ShuffleStep();
+            return true;
         }
 
         public bool TriggerAutoRotate(){

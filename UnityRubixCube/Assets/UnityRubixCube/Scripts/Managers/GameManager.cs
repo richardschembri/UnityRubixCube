@@ -39,6 +39,7 @@ namespace UnityRubixCube.Managers{
         [SerializeField] private CameraController _cameraController;
         private CanvasGroup _stopWatchCanvasGroup;
         [SerializeField] private Button _continueButton;
+        [SerializeField] private int _shuffles = 10;
 
         #region RSMonoBehavior Functions
 
@@ -90,7 +91,7 @@ namespace UnityRubixCube.Managers{
             _stopWatch.ResetTimer();
             _mainMenu.ClosePopup();
             _stopWatch.StartTimer();
-
+            _rubixCube.Shuffle(_shuffles);
             CurrentState = EGameStates.IN_GAME;
 
         }
@@ -114,6 +115,7 @@ namespace UnityRubixCube.Managers{
             _rubixCube.ClearCube();
             CloseAllPopups();
         }
+
         public void QuitGame(){
             CurrentState = EGameStates.END;
             RubixSaveUtils.SaveElapsedTime(_stopWatch.ElapsedSeconds);

@@ -135,7 +135,7 @@ namespace UnityRubixCube {
                 Visualizer.gameObject.SetActive(false);
                 ReleaseCubies();
                 if(transform.localRotation != Quaternion.Euler(Vector3.zero)){
-                    OnMovePerformed.Invoke(_targetMove, IsUndo().Value);
+                    OnMovePerformed.Invoke(_targetMove, IsUndo() != null && IsUndo().Value);
                 }
                 _targetMove = null;
             }
