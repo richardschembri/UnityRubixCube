@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
+using UnityRubixCube;
 
 namespace UnityRubixCube.Utils{
     public static class RubixSaveUtils 
     {
         private const string PREF_CUBIES = "cubies";
         private const string PREF_ELAPSEDTIME = "elapsedtime";
+        private const string PREF_MOVES = "moves";
         [System.Serializable]
         public struct CubieSaveInfo
         {
@@ -40,6 +42,18 @@ namespace UnityRubixCube.Utils{
             }
         }
 
+        [System.Serializable]
+        public struct MoveSaveInfo{
+            public int LayerIndex;
+            public int MoveAxis;
+            public bool Clockwise;
+
+            public MoveSaveInfo(int layerIndex, int moveAxis, bool clockwise){
+                LayerIndex = layerIndex;
+                MoveAxis = moveAxis;
+                Clockwise = clockwise;
+            }
+        }
         //Save Transform
         public static void SaveCubies(ReadOnlyCollection<Cubie> targets)
         {
@@ -64,6 +78,25 @@ namespace UnityRubixCube.Utils{
             PlayerPrefs.SetString(PREF_CUBIES, cubiesJson);
         }
 
+        public static void SaveMoves(LinkedList<RubixCube.Move> targets){                
+           if(targets.Count <= 0)
+               return;
+           var moveSaveInfos = new MoveSaveInfo[targets.Count];
+           var target = targets.First;
+           int i = 0;
+           do{
+               moveSaveInfos[i] = new MoveSaveInfo(
+                                        target.Value.LayerIndex,
+                                        (int)target.Value.MoveAxis,
+                                        target.Value.Clockwise
+               );                
+               target = target.Next; 
+               i++;
+           }while(i < targets.Count);
+            string movesJson = JsonUtils.ToJson(moveSaveInfos, true);
+            PlayerPrefs.SetString(PREF_MOVES, movesJson);
+        }
+
         public static bool HasCubies(){
             return PlayerPrefs.HasKey(PREF_CUBIES);
         }
@@ -79,13 +112,26 @@ namespace UnityRubixCube.Utils{
         //Load Transform
         public static CubieSaveInfo[] LoadCubieSaveInfos()
         {
-            string cubiesJson = PlayerPrefs.GetString(PREF_CUBIES);
-            if (string.IsNullOrEmpty(cubiesJson))
-            {
+            if(!PlayerPrefs.HasKey(PREF_CUBIES)){
                 return null;
             }
+            string cubiesJson = PlayerPrefs.GetString(PREF_CUBIES);
 
             return JsonUtils.FromJson<CubieSaveInfo>(cubiesJson);
+        }
+
+        public static LinkedList<RubixCube.Move> LoadMoves(){
+            var result = new LinkedList<RubixCube.Move>();
+            if(!PlayerPrefs.HasKey(PREF_MOVES)){
+                return result;
+            }
+            string movesJson = PlayerPrefs.GetString(PREF_MOVES);
+
+            var moveSaveInfos = JsonUtils.FromJson<MoveSaveInfo>(movesJson);
+            for(int i = 0; i < moveSaveInfos.Length; i++){
+                result.AddLast(new RubixCube.Move(moveSaveInfos[i]));
+            }
+            return result;
         }
 
         public static float LoadElapsedTime(){

@@ -4,6 +4,7 @@ using UnityEngine;
 using RSToolkit;
 using RSToolkit.Collections;
 using System.Collections.ObjectModel;
+using UnityRubixCube.Utils;
 
 namespace UnityRubixCube {
     [RequireComponent(typeof(CubieSpawner))]
@@ -14,9 +15,9 @@ namespace UnityRubixCube {
         }
 
         public enum ECubeState{
-            IDLE,
-            MANUAL,
-            AUTO
+            IDLE = 0,
+            MANUAL = 1,
+            AUTO = 2
         }
         public class Move{
             public int LayerIndex {get; private set;}
@@ -24,12 +25,17 @@ namespace UnityRubixCube {
 
             public bool Clockwise {get; private set;}
 
-            public Move(int layerIndex, ERubixAxis  moveDirection,bool clockwise){
+            public Move(int layerIndex, ERubixAxis  moveDirection, bool clockwise){
                 LayerIndex = layerIndex;
                 MoveAxis  = moveDirection;
                 Clockwise = clockwise;
             }
 
+            public Move(RubixSaveUtils.MoveSaveInfo moveSaveInfo){
+                LayerIndex = moveSaveInfo.LayerIndex;
+                MoveAxis  = (ERubixAxis)moveSaveInfo.MoveAxis;
+                Clockwise = moveSaveInfo.Clockwise;
+            }
             public void Reverse(){
 
                 Clockwise = !Clockwise;
@@ -161,8 +167,15 @@ namespace UnityRubixCube {
             }
             return false;
         }
+        public void RestoreMoves(){
+            _moves = RubixSaveUtils.LoadMoves();
+        }
         public bool SaveCube(){
             return _cubieSpawnerComponent.SaveCube();
+        }
+
+        public void SaveMoves(){
+            RubixSaveUtils.SaveMoves(_moves);
         }
 
         public ReadOnlyCollection<Cubie> GetCubies(){

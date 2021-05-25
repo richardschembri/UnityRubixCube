@@ -100,6 +100,7 @@ namespace UnityRubixCube.Managers{
             }
             CurrentState = EGameStates.STARTING;
             _rubixCube.RestoreCube();
+            _rubixCube.RestoreMoves();
             _mainMenu.ClosePopup();
             _stopWatch.SetTimer(RubixSaveUtils.LoadElapsedTime());
             _stopWatch.StartTimer();
@@ -117,6 +118,7 @@ namespace UnityRubixCube.Managers{
             CurrentState = EGameStates.END;
             RubixSaveUtils.SaveElapsedTime(_stopWatch.ElapsedSeconds);
             _rubixCube.SaveCube();
+            _rubixCube.SaveMoves();
             ResetGame();
             _mainMenu.OpenPopup();
         }
