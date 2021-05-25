@@ -1,14 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace UnityRubixCube {
     public class Cubie : MonoBehaviour
     {
+        [Serializable]
         public struct CubieIndex{
-            public readonly int x;
-            public readonly int y; 
-            public readonly int z;
+            public int x;
+            public int y; 
+            public int z;
             public CubieIndex(int x, int y, int z){
                 this.x = x;
                 this.y = y;
@@ -31,11 +33,12 @@ namespace UnityRubixCube {
 
         public RubixCube ParentCube {get; private set;}
 
-        public void SetValues(CubieIndex index, Vector3 localPosition, Vector3 localScale){
+        public void SetValues(CubieIndex index, Vector3 localPosition, Vector3 localScale, Quaternion localRotation){
             ParentCube = transform.GetComponentInParent<RubixCube>();
             Index = index;
             transform.localPosition = localPosition;
             transform.localScale = localScale;
+            transform.localRotation = localRotation;
             RefreshName();
             ToggleFaces();
         }

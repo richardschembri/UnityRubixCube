@@ -14,7 +14,7 @@ namespace UnityRubixCube.Controls {
 		}
 		public EStopWatchState CurrentState {get; private set;} = EStopWatchState.STOPPED;
         private Text _textComponent;
-        private float _elapsedSeconds;
+        public float ElapsedSeconds {get; private set;}
 
         [SerializeField]
         private bool _autoStart = false;
@@ -36,10 +36,14 @@ namespace UnityRubixCube.Controls {
         {
             if (CurrentState != EStopWatchState.RUNNING) return;
 
-            _elapsedSeconds += Time.deltaTime;
-            var timeSpan = TimeSpan.FromSeconds(_elapsedSeconds);
+            ElapsedSeconds += Time.deltaTime;
+            var timeSpan = TimeSpan.FromSeconds(ElapsedSeconds);
             _textComponent.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds);
         }
+
+		public void SetTimer(float seconds){
+			ElapsedSeconds = seconds;
+		}
 
         public void StartTimer()
         {
@@ -51,7 +55,7 @@ namespace UnityRubixCube.Controls {
 
         public void ResetTimer()
         {
-            _elapsedSeconds = 0;
+            ElapsedSeconds = 0;
         }
 
         public void StopTimer()

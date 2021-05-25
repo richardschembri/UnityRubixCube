@@ -15,7 +15,6 @@ namespace UnityRubixCube {
 
         public enum ECubeState{
             IDLE,
-            CAMERA,
             MANUAL,
             AUTO
         }
@@ -70,10 +69,14 @@ namespace UnityRubixCube {
         [SerializeField]
         private float _dragSensitivity = 0.4f;
         public float DragSensitivity {get {return _dragSensitivity;}}
+
         public bool IsCubieSelected(Cubie target){
             return SelectedCubie != null && target.ParentCube == this;
         }
 
+        public bool IsCubieSelected(){
+           return IsCubieSelected(SelectedCubie);
+        }
         public bool SelectCubie(Cubie target){
             if(IsCubieSelected(target)){
                 return false;
@@ -88,6 +91,9 @@ namespace UnityRubixCube {
             }
             SelectedCubie = null; 
             return true;
+        }
+        public bool DeselectCubie(){
+            return DeselectCubie(SelectedCubie);
         }
         private bool IsNeighbourIndex(int a, int b){
             return Mathf.Abs(a - b) <= 1;
@@ -108,8 +114,8 @@ namespace UnityRubixCube {
             return result;
         }
 
-        public ECubeState GetRotationState(){
-            return _selectedLayer.CurrentRotationState;
+        public ECubeState GetCubeState(){
+            return _selectedLayer.CurrentCubeState;
         }
         #region RSMonoBehaviour Functions
         protected override void InitComponents()
@@ -118,7 +124,24 @@ namespace UnityRubixCube {
             _cubieSpawnerComponent = GetComponent<CubieSpawner>();
         }
 
+        protected override void InitEvents()
+        {
+            base.InitEvents();
+            _selectedLayer.OnMovePerformed.AddListener(SelectedLayerOnMovePerformed_Listener);
+        }
+
         #endregion RSMonoBehaviour Functions
+
+        #region Events
+        private void SelectedLayerOnMovePerformed_Listener(Move move, bool isUndo){
+            if(isUndo){
+                _moves.RemoveLast();
+            }else{
+                _moves.AddLast(move);
+            }
+        }
+        #endregion Events
+
 
         public void GenerateCube(){
             _cubieSpawnerComponent.GenerateCube();
@@ -130,6 +153,18 @@ namespace UnityRubixCube {
 
         public void ClearCube(){
             _cubieSpawnerComponent.DestroyAllSpawns();
+        }
+
+        public bool RestoreCube(){
+            int cubiesPerSide;
+            if(_cubieSpawnerComponent.RestoreCube(out cubiesPerSide)){
+                CubiesPerSide = cubiesPerSide;
+                return true;
+            }
+            return false;
+        }
+        public bool SaveCube(){
+            return _cubieSpawnerComponent.SaveCube();
         }
 
         public ReadOnlyCollection<Cubie> GetCubies(){
@@ -156,6 +191,18 @@ namespace UnityRubixCube {
             return _selectedLayer.ManualRotate(by);
         }
 
+        public bool HasMoves(){
+            return _moves.Count > 0;
+        }
+
+        public Move GetLastMove(){
+            return _moves.Last.Value;
+        }
+
+        public void UndoMove(){
+            _selectedLayer.UndoMove();
+        }
+
         public float GetTreshold(){
             return 1f / CubiesPerSide * 0.5f;
         }
@@ -176,36 +223,9 @@ namespace UnityRubixCube {
             return true;
         }
 
-        RaycastHit _mouseRaycastHit;
-        Ray _mouseRay;
-        Cubie _hitCubie = null;
-    
         // Update is called once per frame
         void Update()
         {
-            /*
-           // LogInDebugMode($"Mouse Input: {Input.mousePosition}");
-           if(!Input.GetMouseButtonDown(0)
-                || _selectedLayer.CurrentRotationState == RubixLayer.ERotationState.AUTO){
-               return;
-           } 
-
-            LogInDebugMode($"click");
-            _mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            // LogInDebugMode($"Mouse Down Input: {Input.mousePosition}");
-            if(Physics.Raycast(_mouseRay, out _mouseRaycastHit, 500.0f, _layerMask)){
-                var hitParent = _mouseRaycastHit.collider.transform.parent; 
-            LogInDebugMode($"Hit object: {_mouseRaycastHit.collider.transform.name }");
-                if(hitParent == null ){
-                    return;
-                }
-                _hitCubie = hitParent.GetComponent<Cubie>();
-                if(_hitCubie == null){
-                    return;
-                }
-            LogInDebugMode($"Hit cubie: {_hitCubie.gameObject.name }");
-            }
-            */
            
         }
     }

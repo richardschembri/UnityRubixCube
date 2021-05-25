@@ -27,6 +27,7 @@ namespace UnityRubixCube {
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Debug:", EditorStyles.largeLabel);
+            EditorGUI.BeginDisabledGroup(_targetRubixCube.GetCubeState() != RubixCube.ECubeState.IDLE);
             GUILayout.BeginHorizontal();
             if(GUILayout.Button("Generate Cube")){
                 _targetLayerIndex = 0;
@@ -57,8 +58,15 @@ namespace UnityRubixCube {
             }
 
             GUILayout.EndHorizontal();
+            EditorGUI.BeginDisabledGroup(!_targetRubixCube.HasMoves());
 
-            EditorGUI.EndDisabledGroup();
+            if (GUILayout.Button("Undo Move"))
+            {
+                _targetRubixCube.UndoMove();
+            }
+            EditorGUI.EndDisabledGroup(); // HasMoves
+            EditorGUI.EndDisabledGroup(); // Cube is Generated
+            EditorGUI.EndDisabledGroup(); // Cube is IDLE
         }
     }
 }

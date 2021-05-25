@@ -92,11 +92,11 @@ namespace UnityRubixCube {
                     _dragDistance = Input.mousePosition.y - _dragStart.Value.y;
                 break;
             }
-            if( ParentCubie.ParentCube.GetRotationState() != RubixCube.ECubeState.IDLE
+            if( ParentCubie.ParentCube.GetCubeState() != RubixCube.ECubeState.IDLE
                 || _mouseDirection == EMouseDirection.NONE
                 || _cubieNeighbours == null
                 || _cubieNeighbours.Count <= 0){
-                    if(ParentCubie.ParentCube.GetRotationState() == RubixCube.ECubeState.MANUAL){
+                    if(ParentCubie.ParentCube.GetCubeState() == RubixCube.ECubeState.MANUAL){
                         ParentCubie.ParentCube.ManualRotate(_dragDistance ); 
                     }
                     return;
@@ -176,7 +176,7 @@ namespace UnityRubixCube {
 
         void OnMouseUp(){
             ResetValues();
-            if(ParentCubie.ParentCube.GetRotationState() == RubixCube.ECubeState.MANUAL){
+            if(ParentCubie.ParentCube.GetCubeState() == RubixCube.ECubeState.MANUAL){
                 ParentCubie.ParentCube.TriggerAutoRotate();
             }
         }

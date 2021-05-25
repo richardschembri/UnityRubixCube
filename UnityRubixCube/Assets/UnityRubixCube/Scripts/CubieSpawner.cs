@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using RSToolkit.Controls;
+using UnityRubixCube.Utils;
 using System.Collections.ObjectModel;
 
 namespace UnityRubixCube {
@@ -21,6 +22,9 @@ namespace UnityRubixCube {
         private bool isInner(int axisIndex){
             return axisIndex > 0 && axisIndex < ParentCube.CubiesPerSide - 1;
         }
+
+
+        
         public bool GenerateCube(){
             if(GameObjectToSpawn == null) return false;
 
@@ -41,7 +45,7 @@ namespace UnityRubixCube {
                         newCubie = SpawnAndGetGameObject();
                         newCubie.SetValues( new Cubie.CubieIndex(x,y,z),
                                             (new Vector3(x,y,z) / ParentCube.CubiesPerSide) + offset, // Local Position
-                                            localScale);
+                                            localScale, Quaternion.Euler(0f,0f,0f));
                         xIndexPositions[x] = newCubie.transform.localPosition.x;
                         yIndexPositions[y] = newCubie.transform.localPosition.y;
                         zIndexPositions[z] = newCubie.transform.localPosition.z;
@@ -51,7 +55,40 @@ namespace UnityRubixCube {
 
             return true;
         }
+        public bool SaveCube(){
+            if(SpawnedGameObjects.Count <= 0){
+                return false;
+            }
+            RubixSaveUtils.SaveCubies(SpawnedGameObjects);
+            return true;
+        }
+        public bool RestoreCube(out int cubiesPerSide){
+            cubiesPerSide = 0;
+            if(GameObjectToSpawn == null) 
+                return false;
 
+            var cubieSaveInfos = RubixSaveUtils.LoadCubieSaveInfos();
+            if(cubieSaveInfos == null || cubieSaveInfos.Length <= 0)
+                return false;
+
+            DestroyAllSpawns();
+
+            cubiesPerSide = Mathf.CeilToInt(Mathf.Pow(cubieSaveInfos.Length, 1f / 3f));
+            xIndexPositions = new float[cubiesPerSide];
+            yIndexPositions = new float[cubiesPerSide];
+            zIndexPositions = new float[cubiesPerSide];
+            Cubie newCubie;
+            for(int i = 0; i < cubieSaveInfos.Length; i++){
+                newCubie = SpawnAndGetGameObject();
+                newCubie.LoadFromCubieSaveInfo(cubieSaveInfos[i]);
+
+                xIndexPositions[newCubie.Index.x] = newCubie.transform.localPosition.x;
+                yIndexPositions[newCubie.Index.y] = newCubie.transform.localPosition.y;
+                zIndexPositions[newCubie.Index.z] = newCubie.transform.localPosition.z;
+            }
+
+            return false;
+        }
         private int GetAxisIndex(float[] indexList, float axis){
             float treshold = ParentCube.GetTreshold();
             for(int i = 0; i < indexList.Length; i++){

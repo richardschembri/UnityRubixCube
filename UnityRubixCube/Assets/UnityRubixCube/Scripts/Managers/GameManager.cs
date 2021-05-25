@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using RSToolkit;
 using RSToolkit.UI.Controls;
 using UnityRubixCube.Controls;
+using UnityRubixCube.Controllers;
+using UnityRubixCube.Utils;
 
 namespace UnityRubixCube.Managers{
 
@@ -27,33 +29,18 @@ namespace UnityRubixCube.Managers{
 
         [SerializeField] private Toggle _timerToggle;
 
-        const float ZOOM_MIN = 40;
-        const float ZOOM_MAX = 100;
-
-
-        [SerializeField] float _cameraRotationSpeed = 1f;
-        [SerializeField] float _zoomSpeed = 1f;
         [SerializeField] private RubixCube _rubixCube;
+        public RubixCube MainRubixCube {get{return _rubixCube; }}
 
         [SerializeField] private UIPopup _mainMenu;
         [SerializeField] private UIPopup _pauseMenu;
         [SerializeField] private UIPopup _congratsMenu;
         [SerializeField] private StopWatch _stopWatch;
+        [SerializeField] private CameraController _cameraController;
         private CanvasGroup _stopWatchCanvasGroup;
+        [SerializeField] private Button _continueButton;
 
-        private Vector3 _initialCameraPos;
-        private Quaternion _initialCameraRot;
         #region RSMonoBehavior Functions
-        public override bool Init(bool force = false)
-        {
-            if(!base.Init(force)){
-                return false;
-            }
-            _initialCameraPos = Camera.main.transform.position;
-            _initialCameraRot = Camera.main.transform.rotation;
-
-            return true;
-        }
 
         protected override void InitComponents()
         {
@@ -64,6 +51,7 @@ namespace UnityRubixCube.Managers{
             TimerToggleonValueChanged_Listener(_timerToggle.isOn);
         }
         protected override void InitEvents(){
+            _mainMenu.OnOpenPopup.AddListener(MainMenuOnOpenPopup_Listener);
             _sizeSlider.onValueChanged.AddListener(SizeSliderOnValueChanged_Listener);
             _pauseMenu.OnOpenPopup.AddListener(PauseMenuOnOpenPopup_Listener);
             _timerToggle.onValueChanged.AddListener(TimerToggleonValueChanged_Listener);
@@ -71,31 +59,19 @@ namespace UnityRubixCube.Managers{
 
         #endregion RSMonoBehavior Functions
 
-/*
-        private void Zoom(float by){
-           float newZoom = Camera.main.transform.position.z + by;
-           newZoom = Mathf.Min(ZOOM_MAX, newZoom); 
-           newZoom = Mathf.Max(ZOOM_MIN, newZoom); 
-           Camera.main.transform.position = new Vector3(
-               Camera.main.transform.position.x,
-               Camera.main.transform.position.y,
-               newZoom) ;
-        }
-        */
-        private void Zoom(float by){
-           Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView - (by * _zoomSpeed),
-                                                        ZOOM_MIN, ZOOM_MAX);
-        }
-
         private void RefreshSizeSliderText(){
             int s = (int)_sizeSlider.value;
             _sizeSliderText.text = $"{s}x{s}x{s}";
         }
         #region Events
+
         private void SizeSliderOnValueChanged_Listener(float value){
             RefreshSizeSliderText();
         }
 
+        private void MainMenuOnOpenPopup_Listener(UIPopup popup, bool keepCache){
+            _continueButton.interactable = RubixSaveUtils.HasCubies();
+        }
         private void PauseMenuOnOpenPopup_Listener(UIPopup popup, bool keepCache){
             CurrentState = EGameStates.PAUSE;
             _stopWatch.PauseTimer();
@@ -116,15 +92,31 @@ namespace UnityRubixCube.Managers{
             _stopWatch.StartTimer();
 
             CurrentState = EGameStates.IN_GAME;
+
+        }
+        public void ContinueGame(){
+            if(CurrentState != EGameStates.MAIN_MENU && CurrentState != EGameStates.END){
+                return;
+            }
+            CurrentState = EGameStates.STARTING;
+            _rubixCube.RestoreCube();
+            _mainMenu.ClosePopup();
+            _stopWatch.SetTimer(RubixSaveUtils.LoadElapsedTime());
+            _stopWatch.StartTimer();
+
+            CurrentState = EGameStates.IN_GAME;
+
         }
         private void ResetGame(){
-            ResetCamera();
+            _cameraController.ResetCamera();
             _stopWatch.StopTimer();
             _rubixCube.ClearCube();
             CloseAllPopups();
         }
         public void QuitGame(){
             CurrentState = EGameStates.END;
+            RubixSaveUtils.SaveElapsedTime(_stopWatch.ElapsedSeconds);
+            _rubixCube.SaveCube();
             ResetGame();
             _mainMenu.OpenPopup();
         }
@@ -152,37 +144,16 @@ namespace UnityRubixCube.Managers{
             _congratsMenu.ClosePopup();
         }
 
-        private void ResetCamera(){
-            Camera.main.transform.position = _initialCameraPos;
-            Camera.main.transform.rotation = _initialCameraRot;
-        }
-        
         #region MonoBehavior Functions
         // Start is called before the first frame update
         void Start()
         {
            _mainMenu.OpenPopup(); 
+           Debug.Log(PlayerPrefs.GetString("cubies"));
         }
         // Update is called once per frame
         void Update()
         {
-            if(CurrentState != EGameStates.IN_GAME){
-                return;
-            }
-            if(Input.mouseScrollDelta.y != 0){
-                Zoom(Input.mouseScrollDelta.y); 
-            }
-
-            if (Input.GetMouseButton(0))
-            {
-                Camera.main.transform.RotateAround(_rubixCube.transform.parent.position,
-                                                Camera.main.transform.up,
-                                                -Input.GetAxis("Mouse X") * _cameraRotationSpeed);
-
-                Camera.main.transform.RotateAround(_rubixCube.transform.parent.position,
-                                                Camera.main.transform.right,
-                                                -Input.GetAxis("Mouse Y") * _cameraRotationSpeed);
-            }
         }
         #endregion MonoBehavior Functions
     }
