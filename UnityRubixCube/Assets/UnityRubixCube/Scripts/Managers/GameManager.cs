@@ -40,10 +40,19 @@ namespace UnityRubixCube.Managers{
         [SerializeField] private UIPopup _congratsMenu;
         [SerializeField] private StopWatch _stopWatch;
         private CanvasGroup _stopWatchCanvasGroup;
+
+        private Vector3 _initialCameraPos;
+        private Quaternion _initialCameraRot;
         #region RSMonoBehavior Functions
         public override bool Init(bool force = false)
         {
-            return base.Init(force);
+            if(!base.Init(force)){
+                return false;
+            }
+            _initialCameraPos = Camera.main.transform.position;
+            _initialCameraRot = Camera.main.transform.rotation;
+
+            return true;
         }
 
         protected override void InitComponents()
@@ -74,10 +83,8 @@ namespace UnityRubixCube.Managers{
         }
         */
         private void Zoom(float by){
-           float newZoom = Camera.main.fieldOfView - (by * _zoomSpeed);
-           newZoom = Mathf.Min(ZOOM_MAX, newZoom); 
-           newZoom = Mathf.Max(ZOOM_MIN, newZoom); 
-           Camera.main.fieldOfView = newZoom;
+           Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView - (by * _zoomSpeed),
+                                                        ZOOM_MIN, ZOOM_MAX);
         }
 
         private void RefreshSizeSliderText(){
@@ -111,6 +118,7 @@ namespace UnityRubixCube.Managers{
             CurrentState = EGameStates.IN_GAME;
         }
         private void ResetGame(){
+            ResetCamera();
             _stopWatch.StopTimer();
             _rubixCube.ClearCube();
             CloseAllPopups();
@@ -142,6 +150,11 @@ namespace UnityRubixCube.Managers{
             _mainMenu.ClosePopup();
             _pauseMenu.ClosePopup();
             _congratsMenu.ClosePopup();
+        }
+
+        private void ResetCamera(){
+            Camera.main.transform.position = _initialCameraPos;
+            Camera.main.transform.rotation = _initialCameraRot;
         }
         
         #region MonoBehavior Functions
