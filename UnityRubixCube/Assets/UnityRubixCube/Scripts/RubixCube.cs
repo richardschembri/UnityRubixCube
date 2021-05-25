@@ -156,9 +156,7 @@ namespace UnityRubixCube {
         }
 
         public bool RestoreCube(){
-            int cubiesPerSide;
-            if(_cubieSpawnerComponent.RestoreCube(out cubiesPerSide)){
-                CubiesPerSide = cubiesPerSide;
+            if(_cubieSpawnerComponent.RestoreCube(ref _cubiesPerSide)){
                 return true;
             }
             return false;

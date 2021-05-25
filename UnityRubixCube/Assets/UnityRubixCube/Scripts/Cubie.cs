@@ -52,6 +52,15 @@ namespace UnityRubixCube {
             _faceLeft.gameObject.SetActive(Index.z == ParentCube.CubiesPerSide - 1);
         }
 
+        public void ToggleFacesOn(bool on){
+            _faceBack.gameObject.SetActive(on);
+            _faceFront.gameObject.SetActive(on);
+            _faceDown.gameObject.SetActive(on);
+            _faceUp.gameObject.SetActive(on);
+            _faceRight.gameObject.SetActive(on);
+            _faceLeft.gameObject.SetActive(on);
+        }
+
         private void RefreshName(){
             name = $"Cubie(x:{Index.x},y:{Index.y},z:{Index.z})";
         }

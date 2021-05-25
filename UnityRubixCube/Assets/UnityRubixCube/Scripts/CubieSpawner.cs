@@ -62,7 +62,7 @@ namespace UnityRubixCube {
             RubixSaveUtils.SaveCubies(SpawnedGameObjects);
             return true;
         }
-        public bool RestoreCube(out int cubiesPerSide){
+        public bool RestoreCube(ref int cubiesPerSide){
             cubiesPerSide = 0;
             if(GameObjectToSpawn == null) 
                 return false;
@@ -74,6 +74,7 @@ namespace UnityRubixCube {
             DestroyAllSpawns();
 
             cubiesPerSide = Mathf.CeilToInt(Mathf.Pow(cubieSaveInfos.Length, 1f / 3f));
+            Debug.Log($"Cubies per side:{cubiesPerSide}");
             xIndexPositions = new float[cubiesPerSide];
             yIndexPositions = new float[cubiesPerSide];
             zIndexPositions = new float[cubiesPerSide];
@@ -85,6 +86,8 @@ namespace UnityRubixCube {
                 xIndexPositions[newCubie.Index.x] = newCubie.transform.localPosition.x;
                 yIndexPositions[newCubie.Index.y] = newCubie.transform.localPosition.y;
                 zIndexPositions[newCubie.Index.z] = newCubie.transform.localPosition.z;
+                // Displaying all faces due to weird bug
+                newCubie.ToggleFacesOn(true);
             }
 
             return false;
