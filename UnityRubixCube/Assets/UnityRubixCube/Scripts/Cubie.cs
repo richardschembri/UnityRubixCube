@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityRubixCube.Utils;
 
 namespace UnityRubixCube {
     public class Cubie : MonoBehaviour
@@ -19,16 +20,22 @@ namespace UnityRubixCube {
         }
         [SerializeField]
         private CubieFace _faceUp;
+        public CubieFace FaceUp { get { return _faceUp; } }
         [SerializeField]
         private CubieFace _faceDown;
+        public CubieFace FaceDown { get { return _faceDown; } }
         [SerializeField]
         private CubieFace _faceLeft;
+        public CubieFace FaceLeft { get { return _faceLeft; } }
         [SerializeField]
         private CubieFace _faceRight;
+        public CubieFace FaceRight { get { return _faceRight; } }
         [SerializeField]
         private CubieFace _faceFront;
+        public CubieFace FaceFront { get { return _faceFront; } }
         [SerializeField]
         private CubieFace _faceBack;
+        public CubieFace FaceBack { get { return _faceBack; } }
         public CubieIndex Index {get; private set;}
 
         public RubixCube ParentCube {get; private set;}
@@ -40,9 +47,18 @@ namespace UnityRubixCube {
             transform.localScale = localScale;
             transform.localRotation = localRotation;
             RefreshName();
-            ToggleFaces();
+            // ToggleFaces();
         }
 
+        public void SetValues(RubixSaveUtils.CubieSaveInfo csi){
+            SetValues(csi.Index, csi.localPosition, csi.localScale, csi.localRotation);
+            FaceUp.gameObject.SetActive(csi.faceUp);
+            FaceDown.gameObject.SetActive(csi.faceDown);
+            FaceLeft.gameObject.SetActive(csi.faceLeft);
+            FaceRight.gameObject.SetActive(csi.faceRight);
+            FaceFront.gameObject.SetActive(csi.faceFront);
+            FaceBack.gameObject.SetActive(csi.faceBack);
+        }
         public void ToggleFaces(){
             _faceBack.gameObject.SetActive(Index.x == 0);
             _faceFront.gameObject.SetActive(Index.x == ParentCube.CubiesPerSide - 1);

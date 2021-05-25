@@ -16,11 +16,27 @@ namespace UnityRubixCube.Utils{
             public Vector3 localScale;
             public Quaternion localRotation;
 
-            public CubieSaveInfo(Cubie.CubieIndex index, Vector3 localPosition, Vector3 localScale, Quaternion localRotation){
+            public bool faceUp;
+            public bool faceDown;
+            public bool faceLeft;
+            public bool faceRight;
+            public bool faceFront;
+            public bool faceBack;
+            public CubieSaveInfo(Cubie.CubieIndex index, Vector3 localPosition, Vector3 localScale, Quaternion localRotation,
+                bool faceUp, bool faceDown,
+                bool faceLeft, bool faceRight,
+                bool faceFront, bool faceBack
+            ){
                 this.Index = index;
                 this.localPosition = localPosition;
                 this.localScale = localScale;
                 this.localRotation = localRotation;
+                this.faceUp = faceUp ;
+                this.faceDown = faceDown ;
+                this.faceLeft = faceLeft ;
+                this.faceRight = faceRight ;
+                this.faceFront =faceFront ;
+                this.faceBack = faceBack ;
             }
         }
 
@@ -34,8 +50,14 @@ namespace UnityRubixCube.Utils{
                 cubieSaveInfos[i] = new CubieSaveInfo(targets[i].Index,
                                                         targets[i].transform.localPosition,
                                                         targets[i].transform.localScale,
-                                                        targets[i].transform.localRotation
-                                                        );
+                                                        targets[i].transform.localRotation,
+                                                        targets[i].FaceUp.gameObject.activeSelf,
+                                                        targets[i].FaceDown.gameObject.activeSelf,
+                                                        targets[i].FaceLeft.gameObject.activeSelf,
+                                                        targets[i].FaceRight.gameObject.activeSelf,
+                                                        targets[i].FaceFront.gameObject.activeSelf,
+                                                        targets[i].FaceBack.gameObject.activeSelf
+                                                    );
             }
 
             string cubiesJson = JsonUtils.ToJson(cubieSaveInfos, true);
@@ -64,10 +86,6 @@ namespace UnityRubixCube.Utils{
             }
 
             return JsonUtils.FromJson<CubieSaveInfo>(cubiesJson);
-        }
-
-        public static void LoadFromCubieSaveInfo(this Cubie target, CubieSaveInfo cubieSaveInfo){
-            target.SetValues(cubieSaveInfo.Index, cubieSaveInfo.localPosition, cubieSaveInfo.localScale, cubieSaveInfo.localRotation);
         }
 
         public static float LoadElapsedTime(){

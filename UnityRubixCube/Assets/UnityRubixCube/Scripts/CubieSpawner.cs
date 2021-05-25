@@ -46,6 +46,7 @@ namespace UnityRubixCube {
                         newCubie.SetValues( new Cubie.CubieIndex(x,y,z),
                                             (new Vector3(x,y,z) / ParentCube.CubiesPerSide) + offset, // Local Position
                                             localScale, Quaternion.Euler(0f,0f,0f));
+                        newCubie.ToggleFaces();
                         xIndexPositions[x] = newCubie.transform.localPosition.x;
                         yIndexPositions[y] = newCubie.transform.localPosition.y;
                         zIndexPositions[z] = newCubie.transform.localPosition.z;
@@ -81,13 +82,13 @@ namespace UnityRubixCube {
             Cubie newCubie;
             for(int i = 0; i < cubieSaveInfos.Length; i++){
                 newCubie = SpawnAndGetGameObject();
-                newCubie.LoadFromCubieSaveInfo(cubieSaveInfos[i]);
+                newCubie.SetValues(cubieSaveInfos[i]);
 
                 xIndexPositions[newCubie.Index.x] = newCubie.transform.localPosition.x;
                 yIndexPositions[newCubie.Index.y] = newCubie.transform.localPosition.y;
                 zIndexPositions[newCubie.Index.z] = newCubie.transform.localPosition.z;
                 // Displaying all faces due to weird bug
-                newCubie.ToggleFacesOn(true);
+                // newCubie.ToggleFacesOn(true);
             }
 
             return false;
