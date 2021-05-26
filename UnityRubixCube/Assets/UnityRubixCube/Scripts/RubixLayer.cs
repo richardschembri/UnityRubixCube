@@ -14,6 +14,7 @@ namespace UnityRubixCube {
         Quaternion _targetRotation;
         RubixCube.Move _targetMove = null;
 
+
         public bool? IsUndo(){
             if(_targetMove == null){
                 return null;
@@ -121,11 +122,20 @@ namespace UnityRubixCube {
                 return false;
             }
             CurrentCubeState = RubixCube.ECubeState.MANUAL;
-            _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector() * (IsUndo().Value ? -90 : 90));
 
-            if(Mathf.Abs(Quaternion.Angle(transform.localRotation, _targetRotation)) > 1){
-                transform.localRotation =  Quaternion.Euler(_targetMove.GetMoveVector() * by * ParentCube.DragSensitivity);
+            var newAngle = _targetMove.GetMoveVector() * by * ParentCube.DragSensitivity;
+            newAngle = new Vector3(Mathf.Clamp(newAngle.x, -90f, 90f),
+                                Mathf.Clamp(newAngle.y, -90f, 90f),
+                                Mathf.Clamp(newAngle.z, -90f, 90f));
+            if(newAngle.x >= 45f || newAngle.y > 45f || newAngle.z > 45f ){
+                _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector(true) * 90);
+            }else if(newAngle.x <= -45f || newAngle.y <= -45f || newAngle.z <= -45f ){
+                _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector(true) * -90);
+            }else{
+                _targetRotation = Quaternion.Euler(Vector3.zero);
             }
+
+            transform.localRotation =  Quaternion.Euler(newAngle);//_targetMove.GetMoveVector() * by * ParentCube.DragSensitivity);
             return true;
         }
 
