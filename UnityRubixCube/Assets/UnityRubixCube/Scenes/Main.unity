@@ -4528,7 +4528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c2ececfc43d6fc2dab5306425dcb420, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugMode: 0
+  DebugMode: 1
   InitOnAwake: 1
   _sizeSlider: {fileID: 1654767829}
   _timerToggle: {fileID: 502400360}
@@ -4538,8 +4538,11 @@ MonoBehaviour:
   _congratsMenu: {fileID: 1580410193}
   _stopWatch: {fileID: 825575022}
   _cameraController: {fileID: 963194230}
+  _congratsTimeTakenText: {fileID: 1860595688}
   _continueButton: {fileID: 1595071964}
-  _shuffles: 10
+  _menuButton: {fileID: 78026871}
+  _undoButton: {fileID: 27566339}
+  _shuffles: 2
 --- !u!4 &2108818061
 Transform:
   m_ObjectHideFlags: 0

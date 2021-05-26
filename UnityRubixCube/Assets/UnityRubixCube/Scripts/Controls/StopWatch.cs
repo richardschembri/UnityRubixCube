@@ -37,13 +37,17 @@ namespace UnityRubixCube.Controls {
             if (CurrentState != EStopWatchState.RUNNING) return;
 
             ElapsedSeconds += Time.deltaTime;
-            var timeSpan = TimeSpan.FromSeconds(ElapsedSeconds);
-            _textComponent.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds);
+            _textComponent.text = GetFormatTime();
         }
 
 		public void SetTimer(float seconds){
 			ElapsedSeconds = seconds;
 		}
+
+        public string GetFormatTime(){
+            var timeSpan = TimeSpan.FromSeconds(ElapsedSeconds);
+            return string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds);
+        }
 
         public void StartTimer()
         {

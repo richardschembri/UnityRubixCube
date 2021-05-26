@@ -19,6 +19,7 @@ namespace UnityRubixCube.Managers{
             SHUFFLE,
             IN_GAME,
             PAUSE,
+            WIN,
             END
         }
 
@@ -37,8 +38,11 @@ namespace UnityRubixCube.Managers{
         [SerializeField] private UIPopup _congratsMenu;
         [SerializeField] private StopWatch _stopWatch;
         [SerializeField] private CameraController _cameraController;
+        [SerializeField] private Text _congratsTimeTakenText;
         private CanvasGroup _stopWatchCanvasGroup;
         [SerializeField] private Button _continueButton;
+        [SerializeField] private Button _menuButton;
+        [SerializeField] private Button _undoButton;
         [SerializeField] private int _shuffles = 10;
 
         #region RSMonoBehavior Functions
@@ -56,7 +60,15 @@ namespace UnityRubixCube.Managers{
             _sizeSlider.onValueChanged.AddListener(SizeSliderOnValueChanged_Listener);
             _pauseMenu.OnOpenPopup.AddListener(PauseMenuOnOpenPopup_Listener);
             _timerToggle.onValueChanged.AddListener(TimerToggleonValueChanged_Listener);
+
+            _rubixCube.OnShuffleEnd.AddListener(OnShuffleEnd_Listener);
+            _rubixCube.OnSolved.AddListener(RubixCubeOnSolved_Listner);
+
+            _cameraController.OnAnimationComplete.AddListener(CameraControllerOnAnimationComplete_Listner);
         }
+
+
+
 
         #endregion RSMonoBehavior Functions
 
@@ -81,6 +93,20 @@ namespace UnityRubixCube.Managers{
         private void TimerToggleonValueChanged_Listener(bool on){
             _stopWatchCanvasGroup.alpha = on ? 1f : 0f;
         }
+
+        private void OnShuffleEnd_Listener(){
+            CurrentState = EGameStates.IN_GAME;
+        }
+        private void RubixCubeOnSolved_Listner(){
+            _stopWatch.PauseTimer();
+            ToggleInGameButtons(false);
+            CurrentState = EGameStates.WIN;
+            _cameraController.TriggerAnimateCelebration(true);
+        }
+        private void CameraControllerOnAnimationComplete_Listner(){
+            _congratsTimeTakenText.text = _stopWatch.GetFormatTime();
+            _congratsMenu.OpenPopup();
+        }
         #endregion Events
         public void StartGame(){
             if(CurrentState != EGameStates.MAIN_MENU && CurrentState != EGameStates.END){
@@ -89,12 +115,24 @@ namespace UnityRubixCube.Managers{
             CurrentState = EGameStates.STARTING;
             _rubixCube.GenerateCube((int)_sizeSlider.value);
             _stopWatch.ResetTimer();
+            ToggleInGameButtons(true);
             _mainMenu.ClosePopup();
             _stopWatch.StartTimer();
-            _rubixCube.Shuffle(_shuffles);
-            CurrentState = EGameStates.IN_GAME;
 
+            Shuffle();
         }
+
+        private void ToggleInGameButtons(bool on){
+            _menuButton.gameObject.SetActive(on);
+            _undoButton.gameObject.SetActive(on);
+        }
+
+        private void Shuffle(){
+            if(_rubixCube.Shuffle(_shuffles)){
+                CurrentState = EGameStates.SHUFFLE;
+            }
+        }
+
         public void ContinueGame(){
             if(CurrentState != EGameStates.MAIN_MENU && CurrentState != EGameStates.END){
                 return;
@@ -113,6 +151,7 @@ namespace UnityRubixCube.Managers{
             _cameraController.ResetCamera();
             _stopWatch.StopTimer();
             _rubixCube.ClearCube();
+            _rubixCube.ClearMoves();
             CloseAllPopups();
         }
 
@@ -138,6 +177,7 @@ namespace UnityRubixCube.Managers{
             CurrentState = EGameStates.IN_GAME;
         }
 
+
         public void SaveCubeState(){
 
         }
@@ -153,7 +193,6 @@ namespace UnityRubixCube.Managers{
         void Start()
         {
            _mainMenu.OpenPopup(); 
-           Debug.Log(PlayerPrefs.GetString("cubies"));
         }
         // Update is called once per frame
         void Update()

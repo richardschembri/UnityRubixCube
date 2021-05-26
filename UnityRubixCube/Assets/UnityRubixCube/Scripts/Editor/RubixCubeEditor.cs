@@ -67,6 +67,9 @@ namespace UnityRubixCube {
             EditorGUI.EndDisabledGroup(); // HasMoves
             EditorGUI.EndDisabledGroup(); // Cube is Generated
             EditorGUI.EndDisabledGroup(); // Cube is IDLE
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.EnumPopup(_targetRubixCube.GetCubeState());
+            EditorGUI.EndDisabledGroup();
         }
     }
 }

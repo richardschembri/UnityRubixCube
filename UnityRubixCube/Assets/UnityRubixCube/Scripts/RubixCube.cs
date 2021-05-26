@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using UnityRubixCube.Utils;
 using RSToolkit.Helpers;
 using System.Collections;
+using UnityEngine.Events;
 
 namespace UnityRubixCube {
     [RequireComponent(typeof(CubieSpawner))]
@@ -80,6 +81,9 @@ namespace UnityRubixCube {
         [SerializeField]
         private float _dragSensitivity = 0.4f;
         public float DragSensitivity {get {return _dragSensitivity;}}
+
+        public UnityEvent OnShuffleEnd {get; private set;} = new UnityEvent();
+        public UnityEvent OnSolved {get; private set;} = new UnityEvent();
 
         private int _shuffles = 0;
 
@@ -161,9 +165,15 @@ namespace UnityRubixCube {
                     _shuffles--;
                     // ShuffleStep();
                     StartCoroutine(ShuffleStep());
+                }else if(IsSolved()){
+                    Debug.Log("Solved!");
+                    OnSolved.Invoke();
+                }else{
+                    Debug.Log("Not Solved!");
                 }
             }
         }
+
         #endregion Events
 
 
@@ -184,6 +194,10 @@ namespace UnityRubixCube {
                 return true;
             }
             return false;
+        }
+
+        public void ClearMoves(){
+            _moves.Clear();
         }
         public void RestoreMoves(){
             _moves = RubixSaveUtils.LoadMoves();
@@ -277,11 +291,15 @@ namespace UnityRubixCube {
             return _cubieSpawnerComponent.GetLocalPositionIndex(localPosition);
         }
 
+        private bool CompareVectors(Vector3 a, Vector3 b){
+            return (int)a.x == (int)b.x && (int)a.y == (int)b.y && (int)a.z == (int)b.z;
+        }
         public bool IsSolved(){
             var cubies = GetCubies();
             var compare = cubies[0];
             for(int i = 1; i < cubies.Count; i++){
-                if(compare.transform.localRotation != cubies[i].transform.localRotation){
+                if(!CompareVectors(compare.transform.localRotation.eulerAngles, cubies[i].transform.localRotation.eulerAngles)){//(compare.transform.localRotation.eulerAngles != cubies[i].transform.localRotation.eulerAngles){
+                    // Debug.Log($"{compare.transform.localRotation.eulerAngles} != {cubies[i].transform.localRotation.eulerAngles}");
                     return false;
                 }
                 compare = cubies[i];
