@@ -47,11 +47,13 @@ namespace UnityRubixCube.Utils{
             public int LayerIndex;
             public int MoveAxis;
             public bool Clockwise;
+            public bool IsShuffle;
 
-            public MoveSaveInfo(int layerIndex, int moveAxis, bool clockwise){
+            public MoveSaveInfo(int layerIndex, int moveAxis, bool clockwise, bool isShuffle){
                 LayerIndex = layerIndex;
                 MoveAxis = moveAxis;
                 Clockwise = clockwise;
+                IsShuffle = isShuffle;
             }
         }
         //Save Transform
@@ -88,7 +90,8 @@ namespace UnityRubixCube.Utils{
                moveSaveInfos[i] = new MoveSaveInfo(
                                         target.Value.LayerIndex,
                                         (int)target.Value.MoveAxis,
-                                        target.Value.Clockwise
+                                        target.Value.Clockwise,
+                                        target.Value.IsShuffle
                );                
                target = target.Next; 
                i++;

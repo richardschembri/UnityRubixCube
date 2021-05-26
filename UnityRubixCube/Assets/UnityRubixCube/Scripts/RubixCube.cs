@@ -4,6 +4,7 @@ using RSToolkit;
 using System.Collections.ObjectModel;
 using UnityRubixCube.Utils;
 using RSToolkit.Helpers;
+using System.Collections;
 
 namespace UnityRubixCube {
     [RequireComponent(typeof(CubieSpawner))]
@@ -25,16 +26,20 @@ namespace UnityRubixCube {
 
             public bool Clockwise {get; private set;}
 
-            public Move(int layerIndex, ERubixAxis  moveDirection, bool clockwise){
+            public bool IsShuffle {get; private set;}
+
+            public Move(int layerIndex, ERubixAxis  moveDirection, bool clockwise, bool isShuffle){
                 LayerIndex = layerIndex;
                 MoveAxis  = moveDirection;
                 Clockwise = clockwise;
+                IsShuffle = isShuffle;
             }
 
             public Move(RubixSaveUtils.MoveSaveInfo moveSaveInfo){
                 LayerIndex = moveSaveInfo.LayerIndex;
                 MoveAxis  = (ERubixAxis)moveSaveInfo.MoveAxis;
                 Clockwise = moveSaveInfo.Clockwise;
+                IsShuffle = moveSaveInfo.IsShuffle;
             }
             public void Reverse(){
 
@@ -82,10 +87,6 @@ namespace UnityRubixCube {
             get{
                 return CanShuffle() && _shuffles > 0;
             }
-        }
-
-        public bool CanShuffle(){
-            return _moves.Count <= 0;
         }
 
         public bool IsCubieSelected(Cubie target){
@@ -152,15 +153,15 @@ namespace UnityRubixCube {
 
         #region Events
         private void SelectedLayerOnMovePerformed_Listener(Move move, bool isUndo){
-            if(!IsShuffleing){
-                if(isUndo){
-                    _moves.RemoveLast();
-                }else{
-                    _moves.AddLast(move);
-                }
+            if(isUndo){
+                _moves.RemoveLast();
             }else{
-                _shuffles--;
-                ShuffleStep();
+                _moves.AddLast(move);
+                if(move.IsShuffle){
+                    _shuffles--;
+                    // ShuffleStep();
+                    StartCoroutine(ShuffleStep());
+                }
             }
         }
         #endregion Events
@@ -207,16 +208,34 @@ namespace UnityRubixCube {
             return _selectedLayer.SetLayerMove(move);
         }
         public bool SetLayerMove(int layerIndex, ERubixAxis moveDirection,bool clockwise){
-            return SetLayerMove(new Move(layerIndex, moveDirection,clockwise));
+            return SetLayerMove(new Move(layerIndex, moveDirection,clockwise, false));
         }
 
-        public bool SetRandomLayerMove(){
-            return SetLayerMove(RandomHelpers.RandomInt(CubiesPerSide),(ERubixAxis)RandomHelpers.RandomInt(3), RandomHelpers.RandomBool());
+        public bool CanShuffle(){
+            return _moves.Last == null ||  _moves.Last.Value.IsShuffle;
+        }
+        public bool SetShuffleLayerMove(){
+            // Cannot shuffle after a normal move
+            if(!CanShuffle()){
+                return false;
+            }
+            var newMove = new Move(RandomHelpers.RandomInt(CubiesPerSide),(ERubixAxis)RandomHelpers.RandomInt(3), RandomHelpers.RandomBool(), true);
+            if(_moves.Last != null 
+                && _moves.Last.Value.LayerIndex == newMove.LayerIndex
+                && _moves.Last.Value.MoveAxis == newMove.MoveAxis
+                && _moves.Last.Value.Clockwise != newMove.Clockwise ){
+                    // Do not undo previous shuffle
+                    newMove.Reverse();
+                }
+            return SetLayerMove(newMove);
         }
 
-        private void ShuffleStep(){
-            SetRandomLayerMove();
-            TriggerAutoRotate();
+        IEnumerator ShuffleStep(){
+            yield return new WaitForEndOfFrame();
+            if(CanShuffle() && GetCubeState() == ECubeState.IDLE && _shuffles > 0){
+                SetShuffleLayerMove();
+                TriggerAutoRotate();
+            }
         }
 
         public bool Shuffle(int shuffles){
@@ -224,7 +243,8 @@ namespace UnityRubixCube {
                 return false;
             }
             _shuffles = shuffles;
-            ShuffleStep();
+            // ShuffleStep();
+            StartCoroutine(ShuffleStep());
             return true;
         }
 
@@ -245,8 +265,8 @@ namespace UnityRubixCube {
             return _moves.Last.Value;
         }
 
-        public void UndoMove(){
-            _selectedLayer.UndoMove();
+        public void UndoPlayerMove(){
+            _selectedLayer.UndoPlayerMove();
         }
 
         public float GetTreshold(){

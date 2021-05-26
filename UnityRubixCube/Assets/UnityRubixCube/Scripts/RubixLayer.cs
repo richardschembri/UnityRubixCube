@@ -108,8 +108,12 @@ namespace UnityRubixCube {
             return true;
         }
 
-        public bool UndoMove(){
-            return ParentCube.HasMoves() && SetLayerMove(ParentCube.GetLastMove()) && TriggerAutoRotate(); 
+        public bool CanUndoPlayerMove(){
+            return ParentCube.HasMoves() &&  !ParentCube.GetLastMove().IsShuffle;
+        }
+
+        public bool UndoPlayerMove(){
+            return CanUndoPlayerMove() && SetLayerMove(ParentCube.GetLastMove()) && TriggerAutoRotate(); 
         }
         public bool ManualRotate(float by){
             if(_targetMove == null){
@@ -135,7 +139,8 @@ namespace UnityRubixCube {
                 Visualizer.gameObject.SetActive(false);
                 ReleaseCubies();
                 if(transform.localRotation != Quaternion.Euler(Vector3.zero)){
-                    OnMovePerformed.Invoke(_targetMove, IsUndo() != null && IsUndo().Value);
+                    
+                    OnMovePerformed.Invoke(_targetMove, IsUndo().Value);
                 }
                 _targetMove = null;
             }

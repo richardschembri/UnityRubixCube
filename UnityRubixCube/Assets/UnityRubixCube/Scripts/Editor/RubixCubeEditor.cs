@@ -62,7 +62,7 @@ namespace UnityRubixCube {
 
             if (GUILayout.Button("Undo Move"))
             {
-                _targetRubixCube.UndoMove();
+                _targetRubixCube.UndoPlayerMove();
             }
             EditorGUI.EndDisabledGroup(); // HasMoves
             EditorGUI.EndDisabledGroup(); // Cube is Generated
