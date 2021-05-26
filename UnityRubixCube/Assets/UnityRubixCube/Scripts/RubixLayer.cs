@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using RSToolkit;
 using UnityEngine.Events;
+using UnityRubixCube.Managers;
 
 namespace UnityRubixCube {
     public class RubixLayer : RSMonoBehaviour
@@ -116,7 +117,7 @@ namespace UnityRubixCube {
             return CanUndoPlayerMove() && SetLayerMove(ParentCube.GetLastMove()) && TriggerAutoRotate(); 
         }
         public bool ManualRotate(float by){
-            if(_targetMove == null){
+            if(_targetMove == null || GameManager.Instance.CurrentState != GameManager.EGameStates.IN_GAME){
                 return false;
             }
             CurrentCubeState = RubixCube.ECubeState.MANUAL;

@@ -164,7 +164,12 @@ namespace UnityRubixCube {
                 if(move.IsShuffle){
                     _shuffles--;
                     // ShuffleStep();
-                    StartCoroutine(ShuffleStep());
+                    if(_shuffles > 0){
+                        StartCoroutine(ShuffleStep());
+                    }else{
+                        OnShuffleEnd.Invoke(); 
+                        Debug.Log("On Shuffle End!");
+                    }
                 }else if(IsSolved()){
                     Debug.Log("Solved!");
                     OnSolved.Invoke();

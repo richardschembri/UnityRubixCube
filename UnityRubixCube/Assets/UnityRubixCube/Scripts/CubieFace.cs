@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using RSToolkit;
 using System.Collections.Generic;
+using UnityRubixCube.Managers;
 
 namespace UnityRubixCube {
     public class CubieFace : RSMonoBehaviour 
@@ -59,7 +60,7 @@ namespace UnityRubixCube {
         }
         void OnMouseDown()
         {
-            if(!ParentCubie.SelectCubie()){
+            if(!ParentCubie.SelectCubie() || GameManager.Instance.CurrentState != GameManager.EGameStates.IN_GAME){
                 return;
             }
             _mouseZ = Camera.main.WorldToScreenPoint( gameObject.transform.position).z;
@@ -72,6 +73,9 @@ namespace UnityRubixCube {
 
         void OnMouseDrag()
         {
+            if(_dragStart == null){
+                return;
+            }
             switch(_mouseDirection){
                 case EMouseDirection.NONE:
                 _mouseDirection = EMouseDirection.Y;
