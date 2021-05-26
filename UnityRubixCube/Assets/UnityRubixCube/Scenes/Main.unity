@@ -204,7 +204,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1536680297}
-        m_MethodName: UndoMove
+        m_MethodName: UndoPlayerMove
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4539,6 +4539,7 @@ MonoBehaviour:
   _stopWatch: {fileID: 825575022}
   _cameraController: {fileID: 963194230}
   _continueButton: {fileID: 1595071964}
+  _shuffles: 10
 --- !u!4 &2108818061
 Transform:
   m_ObjectHideFlags: 0
