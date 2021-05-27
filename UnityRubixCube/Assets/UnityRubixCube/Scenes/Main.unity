@@ -4526,7 +4526,7 @@ MonoBehaviour:
   _continueButton: {fileID: 1595071964}
   _menuButton: {fileID: 78026871}
   _undoButton: {fileID: 27566339}
-  _shuffles: 2
+  _shuffles: 5
 --- !u!4 &2108818061
 Transform:
   m_ObjectHideFlags: 0

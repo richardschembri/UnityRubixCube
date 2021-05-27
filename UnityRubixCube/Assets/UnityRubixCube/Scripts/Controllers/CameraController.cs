@@ -96,6 +96,68 @@ namespace UnityRubixCube.Controllers{
         {
         }
 
+        void MoveCamera(float x, float y){
+
+                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
+                                                transform.up,
+                                                x * _cameraRotationSpeed);
+
+                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
+                                                transform.right,
+                                                y * _cameraRotationSpeed);
+        }
+        void HandleMouse(){
+            if(Input.mouseScrollDelta.y != 0){
+                Zoom(Input.mouseScrollDelta.y); 
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                MoveCamera(Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"));
+            }
+        }
+
+        bool _wasPinchZooming = false;
+        Vector2 _lastTouchPosition;
+        int _moveFinger;
+        Vector2 _touchMoveAxis;
+        Vector2[] _lastZoomPositions;
+        void HandleTouch(){
+
+            switch(Input.touchCount) {
+                case 1:
+                    _wasPinchZooming = false;
+                    Touch touch = Input.GetTouch(0);
+
+                    if (touch.phase == TouchPhase.Began) {
+                        _lastTouchPosition = touch.position;
+                        _moveFinger = touch.fingerId;
+                    } else if (touch.fingerId == _moveFinger  && touch.phase == TouchPhase.Moved) {
+                        _touchMoveAxis = touch.position - _lastTouchPosition ;
+                        MoveCamera(_touchMoveAxis.x, _touchMoveAxis.y);
+                    }
+                break;
+                case 2: // Zooming
+                    Vector2[] newPositions = new Vector2[]{Input.GetTouch(0).position, Input.GetTouch(1).position};
+                    if (!_wasPinchZooming) {
+                        _lastZoomPositions = newPositions;
+                        _wasPinchZooming = true;
+                    } else {
+                        float newDistance = Vector2.Distance(newPositions[0], newPositions[1]);
+                        float oldDistance = Vector2.Distance(_lastZoomPositions[0], _lastZoomPositions[1]);
+                        float offset = newDistance - oldDistance;
+
+                        Zoom(offset);
+
+                        _lastZoomPositions = newPositions;
+                    }
+                    break;
+        
+                    default: 
+                        _wasPinchZooming = false;
+                        break;
+            }
+        }
         // Update is called once per frame
         void Update()
         {
@@ -106,21 +168,8 @@ namespace UnityRubixCube.Controllers{
                     || IsAnimating){
                 return;
             }    
-
-            if(Input.mouseScrollDelta.y != 0){
-                Zoom(Input.mouseScrollDelta.y); 
-            }
-
-            if (Input.GetMouseButton(0))
-            {
-                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
-                                                transform.up,
-                                                Input.GetAxis("Mouse X") * _cameraRotationSpeed);
-
-                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
-                                                transform.right,
-                                                -Input.GetAxis("Mouse Y") * _cameraRotationSpeed);
-            }
+            HandleMouse();
+            HandleTouch();
             return;
         }
     }

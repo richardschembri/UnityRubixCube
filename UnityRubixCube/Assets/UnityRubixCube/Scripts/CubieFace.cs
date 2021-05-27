@@ -68,9 +68,9 @@ namespace UnityRubixCube {
             _dragStart = Input.mousePosition;
             _offset = gameObject.transform.position - GetMouseAsWorldPoint(_dragStart.Value);
 
-
             _cubieNeighbours = ParentCubie.GetNeighbours();
         }
+        float _dragModifier = 1;
         void OnMouseDrag()
         {
             if(_dragStart == null){
@@ -102,7 +102,7 @@ namespace UnityRubixCube {
                 || _cubieNeighbours == null
                 || _cubieNeighbours.Count <= 0){
                     if(ParentCubie.ParentCube.GetCubeState() == RubixCube.ECubeState.MANUAL){
-                        ParentCubie.ParentCube.ManualRotate(_dragDistance ); 
+                        ParentCubie.ParentCube.ManualRotate(_dragDistance * _dragModifier); 
                     }
                     return;
             }
@@ -131,52 +131,84 @@ namespace UnityRubixCube {
                 return;
             }
 
-            int xDiff = _closestCubie.Index.x - ParentCubie.Index.x;
-            int yDiff = _closestCubie.Index.y - ParentCubie.Index.y;
-            int zDiff = _closestCubie.Index.z - ParentCubie.Index.z;
-            /*
-            if(!ParentCubie.IsEdge(RubixCube.ERubixAxis.X) && _closestCubie.Index.x == ParentCubie.Index.x){
-                if(_closestCubie.Index.y == ParentCubie.Index.y){
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, zDiff > 0);
-                    ParentCubie.ParentCube.ManualRotate(0f);
-                    Debug.Log("Set　Layer Move");
-                }
-            }else if(!ParentCubie.IsEdge(RubixCube.ERubixAxis.Y) && _closestCubie.Index.y == ParentCubie.Index.y){
-                if(_closestCubie.Index.x == ParentCubie.Index.x){
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, zDiff > 0);
-                    ParentCubie.ParentCube.ManualRotate(0f);
-                    Debug.Log("Set　Layer Move");
-                }
-            }else if(!ParentCubie.IsEdge(RubixCube.ERubixAxis.Z) && _closestCubie.Index.z == ParentCubie.Index.z){
-                if(_closestCubie.Index.y == ParentCubie.Index.y){
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, xDiff > 0);
-                    ParentCubie.ParentCube.ManualRotate(0f);
-                    Debug.Log("Set　Layer Move");
+            _dragModifier = 1;
+            // Have same X and Y
+            if(_closestCubie.Index.x == ParentCubie.Index.x && _closestCubie.Index.y == ParentCubie.Index.y){
+                if(!ParentCubie.IsEdge(RubixCube.ERubixAxis.Y)){
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, true); //zDiff > 0);
+                    if(!IsClockwise(RubixCube.ERubixAxis.Y, RubixCube.ERubixAxis.Y)){
+                        _dragModifier = -1;
+                    }
+                }else{
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, true); //zDiff > 0);
                 }
             }
-            */
-            if(_closestCubie.Index.x == ParentCubie.Index.x && _closestCubie.Index.y == ParentCubie.Index.y){
-                if(ParentCubie.IsEdge(RubixCube.ERubixAxis.Y)){
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, zDiff > 0);
+            // Have same Y and Z
+            else if(_closestCubie.Index.y == ParentCubie.Index.y && _closestCubie.Index.z == ParentCubie.Index.z){
+                if(!ParentCubie.IsEdge(RubixCube.ERubixAxis.Y)){
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, true); //xDiff > 0);
+                    if(!IsClockwise(RubixCube.ERubixAxis.Y, RubixCube.ERubixAxis.Y)){
+                        _dragModifier = -1;
+                    }
                 }else{
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, zDiff > 0);
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, true); //-xDiff > 0);
                 }
-            }else if(_closestCubie.Index.y == ParentCubie.Index.y && _closestCubie.Index.z == ParentCubie.Index.z){
-                if(ParentCubie.IsEdge(RubixCube.ERubixAxis.Y)){
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, -xDiff > 0);
-                }else{
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.y, RubixCube.ERubixAxis.Y, xDiff > 0);
-                }
-            }else if(_closestCubie.Index.z == ParentCubie.Index.z && _closestCubie.Index.x == ParentCubie.Index.x){
+            }
+            // Have same X and Z
+            else if(_closestCubie.Index.x == ParentCubie.Index.x && _closestCubie.Index.z == ParentCubie.Index.z){
                 if(ParentCubie.IsEdge(RubixCube.ERubixAxis.X)){
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, -yDiff  > 0);
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.z, RubixCube.ERubixAxis.Z, true); //-yDiff  > 0);
+                    if(!IsClockwise(RubixCube.ERubixAxis.Z, RubixCube.ERubixAxis.X)){
+                        _dragModifier = -1;
+                    }
                 }else if(ParentCubie.IsEdge(RubixCube.ERubixAxis.Z)){
-                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, (ParentCubie.Index.z == 0 ? -yDiff : yDiff) > 0);
+                    ParentCubie.ParentCube.SetLayerMove(ParentCubie.Index.x, RubixCube.ERubixAxis.X, true); //(ParentCubie.Index.z == 0 ? -yDiff : yDiff) > 0);
                 }
             }
                 ParentCubie.ParentCube.ManualRotate(0f);
             Debug.Log($"Closest Cubie {_closestCubie.transform.name} to {ParentCubie.gameObject.name}");
 
+        }
+        private bool IsClockwise(RubixCube.ERubixAxis axis, int selfIndex, int neighbourIndex, RubixCube.ERubixAxis edgeAxis){
+            bool result = true;
+            switch(edgeAxis){
+                case RubixCube.ERubixAxis.X:
+                    if(axis == RubixCube.ERubixAxis.Y){
+                        // y:1 -> y:2  (clockwise)
+                        result = neighbourIndex - selfIndex > 0;
+                    }else if (axis == RubixCube.ERubixAxis.Z){
+                        // z:1 -> z:2  (anticlockwise)
+                        result = neighbourIndex - selfIndex < 0;
+                    }
+                    break;
+                case RubixCube.ERubixAxis.Y:
+                    if(axis == RubixCube.ERubixAxis.X){
+                        // x:1 -> x:2  (anticlockwise)
+                        result = neighbourIndex - selfIndex < 0;
+                    }else if (axis == RubixCube.ERubixAxis.Z){
+                        // z:1 -> z:2  (clockwise)
+                        result = neighbourIndex - selfIndex > 0;
+                    }
+                    break;
+                case RubixCube.ERubixAxis.Z:
+                    if(axis == RubixCube.ERubixAxis.X){
+                        // x:1 -> x:2  (clockwise)
+                        result = neighbourIndex - selfIndex > 0;
+                    }else if (axis == RubixCube.ERubixAxis.Y){
+                        // y:1 -> y:2  (anticlockwise)
+                        result = neighbourIndex - selfIndex < 0;
+                    }
+                    break;
+
+            }
+            if(ParentCubie.IsTop(edgeAxis)){
+                return result;
+            }
+
+            return !result;
+        }
+        private bool IsClockwise(RubixCube.ERubixAxis axis, RubixCube.ERubixAxis edgeAxis){
+            return IsClockwise(axis, ParentCubie.Index.x, _closestCubie.Index.x, edgeAxis);
         }
 
         void OnMouseUp(){

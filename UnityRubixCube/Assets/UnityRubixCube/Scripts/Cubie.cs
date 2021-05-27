@@ -101,8 +101,37 @@ namespace UnityRubixCube {
         public List<Cubie> GetNeighbours(){
             return ParentCube.GetNeighbours(this);
         }
+        private bool IsBottom(int index1D){
+            return index1D == 0;
+        }
+        public bool IsBottom(RubixCube.ERubixAxis axis){
+            switch (axis){
+                case RubixCube.ERubixAxis.X:
+                    return IsBottom(Index.x); 
+                case RubixCube.ERubixAxis.Y:
+                    return IsBottom(Index.y); 
+                case RubixCube.ERubixAxis.Z:
+                    return IsBottom(Index.z); 
+            }
+            return false;
+        }
+        private  bool IsTop(int index1D){
+            return index1D == ParentCube.CubiesPerSide - 1;
+        }
+        public bool IsTop(RubixCube.ERubixAxis axis){
+            switch (axis){
+                case RubixCube.ERubixAxis.X:
+                    return IsTop(Index.x); 
+                case RubixCube.ERubixAxis.Y:
+                    return IsTop(Index.y); 
+                case RubixCube.ERubixAxis.Z:
+                    return IsTop(Index.z); 
+            }
+            return false;
+        }
+
        private bool IsEdge(int index1D){
-           return index1D == 0 || index1D == ParentCube.CubiesPerSide - 1;
+           return IsBottom(index1D) || IsTop(index1D);
        } 
         public bool IsEdge(RubixCube.ERubixAxis axis){
             switch (axis){
