@@ -123,14 +123,16 @@ namespace UnityRubixCube {
             }
             CurrentCubeState = RubixCube.ECubeState.MANUAL;
 
-            var newAngle = _targetMove.GetMoveVector() * by * ParentCube.DragSensitivity;
+            var newAngle = _targetMove.GetMoveVector(true) * by * ParentCube.DragSensitivity;
             newAngle = new Vector3(Mathf.Clamp(newAngle.x, -90f, 90f),
                                 Mathf.Clamp(newAngle.y, -90f, 90f),
                                 Mathf.Clamp(newAngle.z, -90f, 90f));
-            if(newAngle.x >= 45f || newAngle.y > 45f || newAngle.z > 45f ){
+            if(newAngle.x > 45f || newAngle.y > 45f || newAngle.z > 45f ){
                 _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector(true) * 90);
-            }else if(newAngle.x <= -45f || newAngle.y <= -45f || newAngle.z <= -45f ){
+                _targetMove.Clockwise = true;
+            }else if(newAngle.x < -45f || newAngle.y < -45f || newAngle.z < -45f ){
                 _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector(true) * -90);
+                _targetMove.Clockwise = false;
             }else{
                 _targetRotation = Quaternion.Euler(Vector3.zero);
             }

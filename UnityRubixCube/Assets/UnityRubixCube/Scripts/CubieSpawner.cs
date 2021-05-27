@@ -35,9 +35,9 @@ namespace UnityRubixCube {
             Vector3 localScale = Vector3.one / ParentCube.CubiesPerSide;
             Vector3 offset = Vector3.one * ((1f / ParentCube.CubiesPerSide * 0.5f) - 0.5f);
             Cubie newCubie;
-            for(int x = 0; x < ParentCube.CubiesPerSide; x++){
+            for(int z = 0; z < ParentCube.CubiesPerSide; z++){
                 for(int y = 0; y < ParentCube.CubiesPerSide; y++){
-                    for(int z = 0; z < ParentCube.CubiesPerSide; z++){
+                    for(int x = 0; x < ParentCube.CubiesPerSide; x++){
                         if(isInner(x) && isInner(y) && isInner(z)){
                             // Do not spawn inner cubies
                             continue;

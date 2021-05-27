@@ -58,6 +58,7 @@ namespace UnityRubixCube {
         void OnMouseExit(){
             IsMouseOver = false;
         }
+
         void OnMouseDown()
         {
             if(!ParentCubie.SelectCubie() || GameManager.Instance.CurrentState != GameManager.EGameStates.IN_GAME){
@@ -70,12 +71,12 @@ namespace UnityRubixCube {
 
             _cubieNeighbours = ParentCubie.GetNeighbours();
         }
-
         void OnMouseDrag()
         {
             if(_dragStart == null){
                 return;
             }
+
             switch(_mouseDirection){
                 case EMouseDirection.NONE:
                 _mouseDirection = EMouseDirection.Y;
@@ -184,6 +185,17 @@ namespace UnityRubixCube {
                 ParentCubie.ParentCube.TriggerAutoRotate();
             }
         }
+
+        Vector2 ScreenDirection(Vector2 screenPoint, Vector3 worldPoint, Vector3 worldDirection) {
+            Vector2 shifted = Camera.main.WorldToScreenPoint(worldPoint + worldDirection);
+
+            return (shifted - screenPoint).normalized;
+        }
+
+        float GetDragDistance(Vector2 dragStart, Vector2 dragCurrent, Vector2 dragDirection) {
+            return Vector2.Dot(dragCurrent - dragStart, dragDirection);
+        }
+        
         #endregion Mouse Events
         void OnDrawGizmos()
         {

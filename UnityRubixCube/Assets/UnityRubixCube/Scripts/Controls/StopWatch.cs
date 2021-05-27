@@ -60,6 +60,8 @@ namespace UnityRubixCube.Controls {
         public void ResetTimer()
         {
             ElapsedSeconds = 0;
+
+            _textComponent.text = GetFormatTime();
         }
 
         public void StopTimer()

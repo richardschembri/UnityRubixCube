@@ -25,7 +25,7 @@ namespace UnityRubixCube {
             public int LayerIndex {get; private set;}
             public ERubixAxis MoveAxis {get; private set;}
 
-            public bool Clockwise {get; private set;}
+            public bool Clockwise {get; set;}
 
             public bool IsShuffle {get; private set;}
 

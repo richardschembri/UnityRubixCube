@@ -71,11 +71,11 @@ namespace UnityRubixCube.Controllers{
                 _spinCount++;
                 _spinDegree = 0f;
             }
-            transform.RotateAround(GameManager.Instance.MainRubixCube.transform.parent.position,
+            transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
                                             transform.up,
                                             _cameraAnimSpeed);
 
-            transform.RotateAround(GameManager.Instance.MainRubixCube.transform.parent.position,
+            transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
                                             transform.right,
                                             _cameraAnimSpeed);
         }
@@ -113,11 +113,11 @@ namespace UnityRubixCube.Controllers{
 
             if (Input.GetMouseButton(0))
             {
-                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.parent.position,
+                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
                                                 transform.up,
                                                 Input.GetAxis("Mouse X") * _cameraRotationSpeed);
 
-                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.parent.position,
+                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
                                                 transform.right,
                                                 -Input.GetAxis("Mouse Y") * _cameraRotationSpeed);
             }

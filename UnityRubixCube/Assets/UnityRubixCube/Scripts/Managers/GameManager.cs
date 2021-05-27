@@ -96,6 +96,7 @@ namespace UnityRubixCube.Managers{
 
         private void OnShuffleEnd_Listener(){
             CurrentState = EGameStates.IN_GAME;
+            _stopWatch.StartTimer();
         }
         private void RubixCubeOnSolved_Listner(){
             _stopWatch.PauseTimer();
@@ -117,7 +118,6 @@ namespace UnityRubixCube.Managers{
             _stopWatch.ResetTimer();
             ToggleInGameButtons(true);
             _mainMenu.ClosePopup();
-            _stopWatch.StartTimer();
 
             Shuffle();
         }
