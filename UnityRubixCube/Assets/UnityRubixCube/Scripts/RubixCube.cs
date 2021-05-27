@@ -168,13 +168,12 @@ namespace UnityRubixCube {
                         StartCoroutine(ShuffleStep());
                     }else{
                         OnShuffleEnd.Invoke(); 
-                        Debug.Log("On Shuffle End!");
                     }
                 }else if(IsSolved()){
-                    Debug.Log("Solved!");
+                    LogInDebugMode("Solved!");
                     OnSolved.Invoke();
                 }else{
-                    Debug.Log("Not Solved!");
+                    LogInDebugMode("Not Solved!");
                 }
             }
         }
@@ -268,7 +267,6 @@ namespace UnityRubixCube {
         }
 
         public bool TriggerAutoRotate(){
-            LogInDebugMode("TriggerAutoRotate");
             return _selectedLayer.TriggerAutoRotate();
         }
 

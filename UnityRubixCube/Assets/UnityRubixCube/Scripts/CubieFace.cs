@@ -166,7 +166,6 @@ namespace UnityRubixCube {
                 }
             }
                 ParentCubie.ParentCube.ManualRotate(0f);
-            Debug.Log($"Closest Cubie {_closestCubie.transform.name} to {ParentCubie.gameObject.name}");
 
         }
         private bool IsClockwise(RubixCube.ERubixAxis axis, int selfIndex, int neighbourIndex, RubixCube.ERubixAxis edgeAxis){
