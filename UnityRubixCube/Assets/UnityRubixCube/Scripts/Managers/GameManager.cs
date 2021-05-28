@@ -33,9 +33,6 @@ namespace UnityRubixCube.Managers{
         [SerializeField] private RubixCube _rubixCube;
         public RubixCube MainRubixCube {get{return _rubixCube; }}
 
-        [SerializeField] private UIPopup _mainMenu;
-        [SerializeField] private UIPopup _pauseMenu;
-        [SerializeField] private UIPopup _congratsMenu;
         [SerializeField] private StopWatch _stopWatch;
         [SerializeField] private CameraController _cameraController;
         [SerializeField] private Text _congratsTimeTakenText;
@@ -44,6 +41,13 @@ namespace UnityRubixCube.Managers{
         [SerializeField] private Button _menuButton;
         [SerializeField] private Button _undoButton;
         [SerializeField] private int _shuffles = 10;
+
+        [Header("Popups")]
+        [SerializeField] private UIPopup _mainMenu;
+        [SerializeField] private UIPopup _pauseMenu;
+        [SerializeField] private UIPopup _congratsMenu;
+        [SerializeField] private UIPopup _confirmDialog;
+        private bool _confirmRestart = false;
 
         #region RSMonoBehavior Functions
 
@@ -86,6 +90,7 @@ namespace UnityRubixCube.Managers{
             _continueButton.interactable = RubixSaveUtils.HasCubies();
         }
         private void PauseMenuOnOpenPopup_Listener(UIPopup popup, bool keepCache){
+            _confirmDialog.ClosePopup();
             CurrentState = EGameStates.PAUSE;
             _stopWatch.PauseTimer();
         }
@@ -148,6 +153,7 @@ namespace UnityRubixCube.Managers{
 
         }
         private void ResetGame(){
+            _confirmDialog.ClosePopup();
             _cameraController.ResetCamera();
             _stopWatch.StopTimer();
             _rubixCube.ClearCube();
@@ -156,6 +162,7 @@ namespace UnityRubixCube.Managers{
         }
 
         public void QuitGame(){
+            _confirmDialog.ClosePopup();
             CurrentState = EGameStates.END;
             RubixSaveUtils.SaveElapsedTime(_stopWatch.ElapsedSeconds);
             _rubixCube.SaveCube();
@@ -163,7 +170,22 @@ namespace UnityRubixCube.Managers{
             ResetGame();
             _mainMenu.OpenPopup();
         }
+        public void PromptRestart(){
+            _confirmRestart = true;
+            _confirmDialog.OpenPopup();
+        }
+        public void PromptQuit(){
+            _confirmRestart = false;
+            _confirmDialog.OpenPopup();
+        }
 
+        public void PauseConfirm(){
+            if(_confirmRestart){
+                RestartGame();
+            }else{
+                QuitGame();
+            }
+        }
         public void RestartGame(){
             CurrentState = EGameStates.END;
             ResetGame();
