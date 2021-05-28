@@ -71,6 +71,7 @@ namespace UnityRubixCube.Controllers{
                 _spinCount++;
                 _spinDegree = 0f;
             }
+            _cameraComponent.fieldOfView = Mathf.Lerp(_cameraComponent.fieldOfView, 60f, Time.deltaTime);
             transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
                                             transform.up,
                                             _cameraAnimSpeed);

@@ -200,10 +200,6 @@ namespace UnityRubixCube.Managers{
         }
 
 
-        public void SaveCubeState(){
-
-        }
-
         private void CloseAllPopups(){
             _mainMenu.ClosePopup();
             _pauseMenu.ClosePopup();
