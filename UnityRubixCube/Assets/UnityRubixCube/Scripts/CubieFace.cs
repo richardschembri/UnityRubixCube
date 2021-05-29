@@ -64,6 +64,17 @@ namespace UnityRubixCube {
             if(!ParentCubie.SelectCubie() || GameManager.Instance.CurrentState != GameManager.EGameStates.IN_GAME){
                 return;
             }
+            
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            /*
+            // If we didn't hit anything, try again next frame.
+            if (!Physics.Raycast(ray, out RaycastHit hit))
+                return;
+            Debug.Log(hit.normal);
+            */
+
+            
+
             _mouseZ = Camera.main.WorldToScreenPoint( gameObject.transform.position).z;
             _dragStart = Input.mousePosition;
             _offset = gameObject.transform.position - GetMouseAsWorldPoint(_dragStart.Value);
@@ -226,6 +237,12 @@ namespace UnityRubixCube {
         float GetDragDistance(Vector2 dragStart, Vector2 dragCurrent, Vector2 dragDirection) {
             return Vector2.Dot(dragCurrent - dragStart, dragDirection);
         }
+
+        /*
+        public RubixCube.ECubeFace GetCubeFace(){
+
+        }
+        */
         
         #endregion Mouse Events
         void OnDrawGizmos()

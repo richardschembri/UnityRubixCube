@@ -21,6 +21,10 @@ namespace UnityRubixCube {
             AUTO = 2
         }
 
+        public enum CubeFace{
+            UP, DOWN, LEFT, RIGHT, FRONT, BACK
+        }
+
         public class Move{
             public int LayerIndex {get; private set;}
             public ERubixAxis MoveAxis {get; private set;}
