@@ -18,7 +18,7 @@ namespace UnityRubixCube.Controls {
 
         [SerializeField]
         private bool _autoStart = false;
-
+        #region MonoBehavior Functions
         void Awake()
         {
             _textComponent = GetComponent<Text>();
@@ -39,6 +39,7 @@ namespace UnityRubixCube.Controls {
             ElapsedSeconds += Time.deltaTime;
             _textComponent.text = GetFormatTime();
         }
+        #endregion MonoBehavior Functions
 
 		public void SetTimer(float seconds){
 			ElapsedSeconds = seconds;

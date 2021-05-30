@@ -11,6 +11,7 @@ namespace UnityRubixCube {
     [RequireComponent(typeof(CubieSpawner))]
     public class RubixCube : RSMonoBehaviour
     {
+        #region Enums
         public enum ERubixAxis{
             X = 0, Y = 1, Z = 2
         }
@@ -20,11 +21,9 @@ namespace UnityRubixCube {
             MANUAL = 1,
             AUTO = 2
         }
+        #endregion Enums
 
-        public enum CubeFace{
-            UP, DOWN, LEFT, RIGHT, FRONT, BACK
-        }
-
+        /// <summary>This class represents a move/turn of a rubicks cube layer.</summary>
         public class Move{
             public int LayerIndex {get; private set;}
             public ERubixAxis MoveAxis {get; private set;}
@@ -86,8 +85,8 @@ namespace UnityRubixCube {
         public Cubie SelectedCubie { get; private set; } = null;
 
         [SerializeField]
-        private float _dragTreshold = 0.025f;
-        public float DragTreshold { get {return _dragTreshold;} }
+        private float _dragDeadzone = 90f;
+        public float DragDeadzone { get {return _dragDeadzone;} }
         [SerializeField]
         private float _dragSensitivity = 0.4f;
         public float DragSensitivity {get {return _dragSensitivity;}}
@@ -107,6 +106,7 @@ namespace UnityRubixCube {
         public Vector3 CubieOffset {get { return _cubieSpawnerComponent.CubieOffset; } }
         public float CubieDistance {get { return _cubieSpawnerComponent.CubieDistance; } }
 
+        #region Cubie Logic
         public bool IsCubieSelected(Cubie target){
             return SelectedCubie != null && target.ParentCube == this;
         }
@@ -115,9 +115,6 @@ namespace UnityRubixCube {
            return IsCubieSelected(SelectedCubie);
         }
 
-        public bool IsLayerMoveSet(){
-            return _selectedLayer.IsLayerMoveSet();
-        }
         public bool SelectCubie(Cubie target){
             if(IsCubieSelected(target)){
                 return false;
@@ -136,30 +133,8 @@ namespace UnityRubixCube {
         public bool DeselectCubie(){
             return DeselectCubie(SelectedCubie);
         }
-        private bool IsNeighbourIndex(int a, int b){
-            return Mathf.Abs(a - b) <= 1;
-        }
+        #endregion Cubie Logic
 
-        // TODO: refactor
-        public List<Cubie> GetNeighbours(Cubie target){
-            var cubies = GetCubies();
-            var result = new List<Cubie>();
-            for(int i = 0; i < cubies.Count; i++){
-                if(cubies[i] == target){
-                    continue;
-                }
-                if(IsNeighbourIndex(target.Index.x, cubies[i].Index.x)
-                    && IsNeighbourIndex(target.Index.y, cubies[i].Index.y)
-                    && IsNeighbourIndex(target.Index.z, cubies[i].Index.z)){
-                        result.Add(cubies[i]);
-                    }
-            }
-            return result;
-        }
-
-        public ECubeState GetCubeState(){
-            return _selectedLayer.CurrentCubeState;
-        }
         #region RSMonoBehaviour Functions
         protected override void InitComponents()
         {
@@ -173,13 +148,6 @@ namespace UnityRubixCube {
             _selectedLayer.OnMovePerformed.AddListener(SelectedLayerOnMovePerformed_Listener);
         }
 
-        public Vector3 GetLayerDirectionTo(Vector3 targetPosition){
-            return targetPosition - _selectedLayer.transform.position;
-        }
-        public Vector3 GetDirectionTo(Vector3 targetPosition){
-            return targetPosition - this.transform.position;
-        }
-
         #endregion RSMonoBehaviour Functions
 
         #region Events
@@ -190,7 +158,6 @@ namespace UnityRubixCube {
                 _moves.AddLast(move);
                 if(move.IsShuffle){
                     _shuffles--;
-                    // ShuffleStep();
                     if(_shuffles > 0){
                         StartCoroutine(ShuffleStep());
                     }else{
@@ -207,7 +174,7 @@ namespace UnityRubixCube {
 
         #endregion Events
 
-
+        #region Cubie Spawner wrapper functions
         public void GenerateCube(){
             _cubieSpawnerComponent.GenerateCube();
         }
@@ -227,35 +194,24 @@ namespace UnityRubixCube {
             return false;
         }
 
-        public void ClearMoves(){
-            _moves.Clear();
-        }
-        public void RestoreMoves(){
-            _moves = RubixSaveUtils.LoadMoves();
-        }
         public bool SaveCube(){
             return _cubieSpawnerComponent.SaveCube();
         }
 
-        public void SaveMoves(){
-            RubixSaveUtils.SaveMoves(_moves);
-        }
 
         public ReadOnlyCollection<Cubie> GetCubies(){
             return _cubieSpawnerComponent.SpawnedGameObjects;
         }
-
         public int CubiesCount(){
             return GetCubies().Count;
         }
 
-        public bool SetLayerMove(Move move){
-            return _selectedLayer.SetLayerMove(move);
+        public Cubie.CubieIndex GetLocalPositionIndex(Vector3 localPosition){
+            return _cubieSpawnerComponent.GetLocalPositionIndex(localPosition);
         }
-        public bool SetLayerMove(int layerIndex, ERubixAxis moveDirection,bool clockwise){
-            return SetLayerMove(new Move(layerIndex, moveDirection,clockwise, false));
-        }
+        #endregion Cubie Spawner wrapper functions
 
+        #region Shuffle Logic
         public bool CanShuffle(){
             return _moves.Last == null ||  _moves.Last.Value.IsShuffle;
         }
@@ -292,7 +248,20 @@ namespace UnityRubixCube {
             StartCoroutine(ShuffleStep());
             return true;
         }
+        #endregion Shuffle Logic
 
+        #region Selected Layer wrapper functions
+
+        public ECubeState GetCubeState(){
+            return _selectedLayer.CurrentCubeState;
+        }
+
+        public bool SetLayerMove(Move move){
+            return _selectedLayer.SetLayerMove(move);
+        }
+        public bool SetLayerMove(int layerIndex, ERubixAxis moveDirection,bool clockwise){
+            return SetLayerMove(new Move(layerIndex, moveDirection,clockwise, false));
+        }
         public bool TriggerAutoRotate(){
             return _selectedLayer.TriggerAutoRotate();
         }
@@ -300,7 +269,22 @@ namespace UnityRubixCube {
         public bool ManualRotate(float by){
             return _selectedLayer.ManualRotate(by);
         }
+        public void UndoPlayerMove(){
+            _selectedLayer.UndoPlayerMove();
+        }
 
+        public bool IsLayerMoveSet(){
+            return _selectedLayer.IsLayerMoveSet();
+        }
+        #endregion Selected Layer wrapper functions
+
+        #region Moves wrapper functions
+        public void ClearMoves(){
+            _moves.Clear();
+        }
+        public void RestoreMoves(){
+            _moves = RubixSaveUtils.LoadMoves();
+        }
         public bool HasMoves(){
             return _moves.Count > 0;
         }
@@ -309,16 +293,14 @@ namespace UnityRubixCube {
             return _moves.Last.Value;
         }
 
-        public void UndoPlayerMove(){
-            _selectedLayer.UndoPlayerMove();
+        public void SaveMoves(){
+            RubixSaveUtils.SaveMoves(_moves);
         }
 
-        public float GetTreshold(){
+        #endregion Moves wrapper functions
+
+        public float GetCollectTreshold(){
             return 1f / CubiesPerSide * 0.5f;
-        }
-
-        public Cubie.CubieIndex GetLocalPositionIndex(Vector3 localPosition){
-            return _cubieSpawnerComponent.GetLocalPositionIndex(localPosition);
         }
 
         private bool CompareVectors(Vector3 a, Vector3 b){
@@ -328,19 +310,12 @@ namespace UnityRubixCube {
             var cubies = GetCubies();
             var compare = cubies[0];
             for(int i = 1; i < cubies.Count; i++){
-                if(!CompareVectors(compare.transform.localRotation.eulerAngles, cubies[i].transform.localRotation.eulerAngles)){//(compare.transform.localRotation.eulerAngles != cubies[i].transform.localRotation.eulerAngles){
-                    // Debug.Log($"{compare.transform.localRotation.eulerAngles} != {cubies[i].transform.localRotation.eulerAngles}");
+                if(!CompareVectors(compare.transform.localRotation.eulerAngles, cubies[i].transform.localRotation.eulerAngles)){
                     return false;
                 }
                 compare = cubies[i];
             }
             return true;
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-           
         }
     }
 }

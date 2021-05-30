@@ -6,7 +6,6 @@ using UnityEngine;
 namespace UnityRubixCube.Utils{
     public class JsonUtils
     {
-
         public static T[] FromJson<T>(string json)
         {
             JsonArrayWrapper<T> wrapper = UnityEngine.JsonUtility.FromJson<JsonArrayWrapper<T>>(json);

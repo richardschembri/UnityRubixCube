@@ -64,14 +64,12 @@ namespace UnityRubixCube {
             var cubies = ParentCubie.ParentCube.GetCubies();
             Cubie oppositeCubie = null;
 
-            // Debug.Log($"Cubie Pos: {ParentCubie.transform.position} - Offset Pos:{offsetPosition}");
             for(int i = 0; i < cubies.Count; i++){
                 if(cubies[i] == ParentCubie){
                     continue;
                 }
                 if( (Vector3.Distance(offsetPosition, cubies[i].transform.localPosition) < ParentCubie.ParentCube.CubieDistance * 0.1f)){
                     
-                    // Debug.Log($"Neighbour Pos: {cubies[i].transform.localPosition} {Vector3.Distance(offsetPosition, cubies[i].transform.localPosition)}");
                     return cubies[i];
                 }
                 else if(( Vector3.Distance(offsetFarPosition, cubies[i].transform.localPosition) < ParentCubie.ParentCube.CubieDistance * 0.01f))
@@ -80,7 +78,6 @@ namespace UnityRubixCube {
                 }    
             }
 
-            // Debug.Log($"{ParentCubie.transform.localPosition} -> {offsetFarPosition} {(GetBehindFaceDirection() * ParentCubie.ParentCube.CubieDistance * ParentCubie.ParentCube.CubiesPerSide)}");
             return oppositeCubie;
         }
 
@@ -120,30 +117,6 @@ namespace UnityRubixCube {
             }
             return RubixCube.ERubixAxis.Z;
         }
-
-        #region Mouse Events
-
-        void OnMouseOver(){
-            IsMouseOver = true;
-        }
-        void OnMouseExit(){
-            IsMouseOver = false;
-        }
-
-        void OnMouseDown()
-        {
-            if(!ParentCubie.SelectCubie() || GameManager.Instance.CurrentState != GameManager.EGameStates.IN_GAME){
-                return;
-            }
-
-            _mouseZ = Camera.main.WorldToScreenPoint( gameObject.transform.position).z;
-            _dragStart = Input.mousePosition;// GetMouseAsWorldPoint(Input.mousePosition); // Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            _dragStartHit = GetMouseHit().point;
-
-            _behindCubie = GetBehindFaceCubie();
-        }
-
-
         public RubixCube.ERubixAxis GetDragAxis(){
 
             if(_dragCubie.Index.x != ParentCubie.Index.x){
@@ -154,67 +127,7 @@ namespace UnityRubixCube {
             return RubixCube.ERubixAxis.Z;
         }
 
-        void HandleDrag(){
-
-            switch(_mouseDirection){
-                case EMouseDirection.NONE:
-                _mouseDirection = EMouseDirection.Y;
-                _dragDistance = Input.mousePosition.y - _dragStart.Value.y;
-                if(Mathf.Abs(Input.mousePosition.x - _dragStart.Value.x) > Mathf.Abs(_dragDistance)){
-                    _mouseDirection = EMouseDirection.X;
-                    _dragDistance = Input.mousePosition.x - _dragStart.Value.x;
-                }
-                break;
-                case EMouseDirection.X:
-                    _dragDistance = Input.mousePosition.x - _dragStart.Value.x;
-                break;
-                case EMouseDirection.Y:
-                    _dragDistance = Input.mousePosition.y - _dragStart.Value.y;
-                break;
-            }
-            if(Mathf.Abs(_dragDistance) < 90f){
-                _mouseDirection = EMouseDirection.NONE;
-            }
-            if(ParentCubie.ParentCube.GetCubeState() != RubixCube.ECubeState.IDLE ||
-                _mouseDirection == EMouseDirection.NONE){
-                if(ParentCubie.ParentCube.GetCubeState() == RubixCube.ECubeState.MANUAL){
-                    ParentCubie.ParentCube.ManualRotate(_dragDistance * _dragModifier); 
-                }
-                return;
-            }
-
-           _dragCubie = GetDragNeighbour(out bool isOpposite);
-           if(_dragCubie == null){
-               return;
-           }
-            // Debug.Log(_dragDistance);
-            // Debug.Log($"{ParentCubie.ParentCube.GetCubeState()} {ParentCubie.name} -> {_dragCubie.name}");
-            var commonAxis = GetCommonRubixAxis();
-            var dragAxis = GetDragAxis();
-            int layerIndex = ParentCubie.Index.z;
-            switch(commonAxis){
-                case RubixCube.ERubixAxis.X:
-                layerIndex = ParentCubie.Index.x;
-                break;
-                case RubixCube.ERubixAxis.Y:
-                layerIndex = ParentCubie.Index.y;
-                break;
-            }
-            SetDragModifier(commonAxis, dragAxis, isOpposite);
-            var newMove = new RubixCube.Move(layerIndex, commonAxis, true, false);
-             ParentCubie.ParentCube.SetLayerMove(newMove); //isClockwise); //zDiff > 0);
-            ParentCubie.ParentCube.ManualRotate(0f);
-        }
-        void OnMouseDrag()
-        {
-
-            if(_dragStartHit == null ) {
-                return;
-            }
-
-            HandleDrag();
-        }
-
+        // This function is an abomination that needs to be destroyed
         private void SetDragModifier(RubixCube.ERubixAxis commonAxis, RubixCube.ERubixAxis dragAxis, bool isOpposite){
             // Debug.Log("Check Is IsOpposite");
             _dragModifier = 1;
@@ -271,6 +184,87 @@ namespace UnityRubixCube {
             }
                            //  Debug.Log($"Drag Modifier: {_dragModifier }");
 
+        }
+        void HandleDrag(){
+
+            switch(_mouseDirection){
+                case EMouseDirection.NONE:
+                _mouseDirection = EMouseDirection.Y;
+                _dragDistance = Input.mousePosition.y - _dragStart.Value.y;
+                if(Mathf.Abs(Input.mousePosition.x - _dragStart.Value.x) > Mathf.Abs(_dragDistance)){
+                    _mouseDirection = EMouseDirection.X;
+                    _dragDistance = Input.mousePosition.x - _dragStart.Value.x;
+                }
+                break;
+                case EMouseDirection.X:
+                    _dragDistance = Input.mousePosition.x - _dragStart.Value.x;
+                break;
+                case EMouseDirection.Y:
+                    _dragDistance = Input.mousePosition.y - _dragStart.Value.y;
+                break;
+            }
+            if(Mathf.Abs(_dragDistance) <  ParentCubie.ParentCube.DragDeadzone){
+                _mouseDirection = EMouseDirection.NONE;
+            }
+            if(ParentCubie.ParentCube.GetCubeState() != RubixCube.ECubeState.IDLE ||
+                _mouseDirection == EMouseDirection.NONE){
+                if(ParentCubie.ParentCube.GetCubeState() == RubixCube.ECubeState.MANUAL){
+                    ParentCubie.ParentCube.ManualRotate(_dragDistance * _dragModifier); 
+                }
+                return;
+            }
+
+           _dragCubie = GetDragNeighbour(out bool isOpposite);
+           if(_dragCubie == null){
+               return;
+           }
+            // Debug.Log(_dragDistance);
+            // Debug.Log($"{ParentCubie.ParentCube.GetCubeState()} {ParentCubie.name} -> {_dragCubie.name}");
+            var commonAxis = GetCommonRubixAxis();
+            var dragAxis = GetDragAxis();
+            int layerIndex = ParentCubie.Index.z;
+            switch(commonAxis){
+                case RubixCube.ERubixAxis.X:
+                layerIndex = ParentCubie.Index.x;
+                break;
+                case RubixCube.ERubixAxis.Y:
+                layerIndex = ParentCubie.Index.y;
+                break;
+            }
+            SetDragModifier(commonAxis, dragAxis, isOpposite);
+            var newMove = new RubixCube.Move(layerIndex, commonAxis, true, false);
+             ParentCubie.ParentCube.SetLayerMove(newMove); //isClockwise); //zDiff > 0);
+            ParentCubie.ParentCube.ManualRotate(0f);
+        }
+        #region Mouse Events
+
+        void OnMouseOver(){
+            IsMouseOver = true;
+        }
+        void OnMouseExit(){
+            IsMouseOver = false;
+        }
+
+        void OnMouseDown()
+        {
+            if(!ParentCubie.SelectCubie() || GameManager.Instance.CurrentState != GameManager.EGameStates.IN_GAME){
+                return;
+            }
+
+            _mouseZ = Camera.main.WorldToScreenPoint( gameObject.transform.position).z;
+            _dragStart = Input.mousePosition;// GetMouseAsWorldPoint(Input.mousePosition); // Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            _dragStartHit = GetMouseHit().point;
+
+            _behindCubie = GetBehindFaceCubie();
+        }
+
+        void OnMouseDrag()
+        {
+            if(_dragStartHit == null ) {
+                return;
+            }
+
+            HandleDrag();
         }
 
         void OnMouseUp(){

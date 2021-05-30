@@ -51,7 +51,6 @@ namespace UnityRubixCube.Managers{
         private bool _confirmRestart = false;
 
         #region RSMonoBehavior Functions
-
         protected override void InitComponents()
         {
             base.InitComponents();
@@ -71,10 +70,6 @@ namespace UnityRubixCube.Managers{
 
             _cameraController.OnAnimationComplete.AddListener(CameraControllerOnAnimationComplete_Listner);
         }
-
-
-
-
         #endregion RSMonoBehavior Functions
 
         private void RefreshSizeSliderText(){
@@ -213,10 +208,6 @@ namespace UnityRubixCube.Managers{
         void Start()
         {
            _mainMenu.OpenPopup(); 
-        }
-        // Update is called once per frame
-        void Update()
-        {
         }
         #endregion MonoBehavior Functions
     }

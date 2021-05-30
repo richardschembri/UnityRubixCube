@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 namespace UnityRubixCube {
     public class CubieSpawner : Spawner<Cubie>
     {
+        // Cache the positions at indexes
         float[] xIndexPositions;
         float[] yIndexPositions;
         float[] zIndexPositions;
@@ -24,8 +25,6 @@ namespace UnityRubixCube {
         private bool isInner(int axisIndex){
             return axisIndex > 0 && axisIndex < ParentCube.CubiesPerSide - 1;
         }
-
-
         
         public bool GenerateCube(){
             if(GameObjectToSpawn == null) return false;
@@ -97,7 +96,7 @@ namespace UnityRubixCube {
             return false;
         }
         private int GetAxisIndex(float[] indexList, float axis){
-            float treshold = ParentCube.GetTreshold();
+            float treshold = ParentCube.GetCollectTreshold();
             for(int i = 0; i < indexList.Length; i++){
                 if(Mathf.Abs(indexList[i] - axis) < treshold){
                     return i;

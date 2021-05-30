@@ -18,6 +18,7 @@ namespace UnityRubixCube {
                 this.z = z;
             }
         }
+        #region Face Components
         [SerializeField]
         private CubieFace _faceUp;
         public CubieFace FaceUp { get { return _faceUp; } }
@@ -36,6 +37,7 @@ namespace UnityRubixCube {
         [SerializeField]
         private CubieFace _faceBack;
         public CubieFace FaceBack { get { return _faceBack; } }
+        #endregion Faces Components
         public CubieIndex Index {get; private set;}
 
         public RubixCube ParentCube {get; private set;}
@@ -97,10 +99,6 @@ namespace UnityRubixCube {
         public bool IsCubieSelected(){
             return ParentCube.IsCubieSelected(this);
         }
-        
-        public List<Cubie> GetNeighbours(){
-            return ParentCube.GetNeighbours(this);
-        }
         private bool IsBottom(int index1D){
             return index1D == 0;
         }
@@ -152,17 +150,6 @@ namespace UnityRubixCube {
             _faceRight.IsMouseOver ||
             _faceFront.IsMouseOver ||
             _faceBack.IsMouseOver; 
-        }
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            
         }
     }
 }

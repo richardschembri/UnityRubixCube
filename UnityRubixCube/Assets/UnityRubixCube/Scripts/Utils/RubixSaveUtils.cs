@@ -10,6 +10,8 @@ namespace UnityRubixCube.Utils{
         private const string PREF_CUBIES = "cubies";
         private const string PREF_ELAPSEDTIME = "elapsedtime";
         private const string PREF_MOVES = "moves";
+
+        #region Save Structs
         [System.Serializable]
         public struct CubieSaveInfo
         {
@@ -56,7 +58,9 @@ namespace UnityRubixCube.Utils{
                 IsShuffle = isShuffle;
             }
         }
-        //Save Transform
+        #endregion Save Structs
+
+        #region Save Logic
         public static void SaveCubies(ReadOnlyCollection<Cubie> targets)
         {
             // TransformInfo[] trnfrm = new TransformInfo[tranformToSave.Length];
@@ -100,18 +104,12 @@ namespace UnityRubixCube.Utils{
             PlayerPrefs.SetString(PREF_MOVES, movesJson);
         }
 
-        public static bool HasCubies(){
-            return PlayerPrefs.HasKey(PREF_CUBIES);
-        }
-
         public static void SaveElapsedTime(float elapsedtime){
             PlayerPrefs.SetFloat(PREF_ELAPSEDTIME, elapsedtime);
         }
+        #endregion Save Logic
 
-        public static void DeleteAll(){
-            PlayerPrefs.DeleteAll();
-        }
-
+        #region Load Logic
         //Load Transform
         public static CubieSaveInfo[] LoadCubieSaveInfos()
         {
@@ -139,6 +137,15 @@ namespace UnityRubixCube.Utils{
 
         public static float LoadElapsedTime(){
             return PlayerPrefs.GetFloat(PREF_ELAPSEDTIME, 0f);
+        }
+        #endregion Load Logic
+
+        public static bool HasCubies(){
+            return PlayerPrefs.HasKey(PREF_CUBIES);
+        }
+
+        public static void DeleteAll(){
+            PlayerPrefs.DeleteAll();
         }
     }
 }

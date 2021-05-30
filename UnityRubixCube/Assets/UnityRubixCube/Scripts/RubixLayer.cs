@@ -53,7 +53,7 @@ namespace UnityRubixCube {
           return true;
         }
         private void CollectCubies(){
-            float treshhold = ParentCube.GetTreshold();
+            float treshhold = ParentCube.GetCollectTreshold();
             var allCubies = ParentCube.GetCubies();
             float distance = Mathf.Infinity;
             for(int i = 0; i < allCubies.Count; i++){
@@ -87,12 +87,12 @@ namespace UnityRubixCube {
         }
 
         float _step;
+        #region Move Logic
         public bool SetLayerMove(RubixCube.Move move){
             if(CurrentCubeState != RubixCube.ECubeState.IDLE){
                 return false;
             }
             _targetMove = move;
-            // Debug.Log(move.ToString());
             _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector() * (IsUndo().Value ? -90 : 90));
 
             float scale = 1f / ParentCube.CubiesPerSide;
@@ -121,6 +121,8 @@ namespace UnityRubixCube {
         public bool UndoPlayerMove(){
             return CanUndoPlayerMove() && SetLayerMove(ParentCube.GetLastMove()) && TriggerAutoRotate(); 
         }
+        #endregion Move Logic
+        #region Rotate Functions
         public bool ManualRotate(float by){
             if(_targetMove == null || GameManager.Instance.CurrentState != GameManager.EGameStates.IN_GAME){
                 return false;
@@ -165,15 +167,9 @@ namespace UnityRubixCube {
                 _targetMove = null;
             }
         }
-        
-        #region MonoBehavior Functions
-        // Start is called before the first frame update
-        void Start()
-        {
-            
-        }
+        #endregion Rotate Functions
 
-        // Update is called once per frame
+        #region MonoBehavior Functions
         void Update()
         {
             if(CurrentCubeState == RubixCube.ECubeState.AUTO){
