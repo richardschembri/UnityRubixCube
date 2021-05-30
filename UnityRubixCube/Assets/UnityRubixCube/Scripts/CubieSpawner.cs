@@ -11,6 +11,8 @@ namespace UnityRubixCube {
         float[] xIndexPositions;
         float[] yIndexPositions;
         float[] zIndexPositions;
+        public Vector3 CubieOffset {get; private set;} = Vector3.zero;
+        public float CubieDistance {get; private set;} = 0f;
 
         public RubixCube ParentCube {get; private set;}
         protected override void InitComponents()
@@ -33,7 +35,7 @@ namespace UnityRubixCube {
             zIndexPositions = new float[ParentCube.CubiesPerSide];
             DestroyAllSpawns();
             Vector3 localScale = Vector3.one / ParentCube.CubiesPerSide;
-            Vector3 offset = Vector3.one * ((1f / ParentCube.CubiesPerSide * 0.5f) - 0.5f);
+            CubieOffset  = Vector3.one * ((1f / ParentCube.CubiesPerSide * 0.5f) - 0.5f);
             Cubie newCubie;
             for(int z = 0; z < ParentCube.CubiesPerSide; z++){
                 for(int y = 0; y < ParentCube.CubiesPerSide; y++){
@@ -44,7 +46,7 @@ namespace UnityRubixCube {
                         }
                         newCubie = SpawnAndGetGameObject();
                         newCubie.SetValues( new Cubie.CubieIndex(x,y,z),
-                                            (new Vector3(x,y,z) / ParentCube.CubiesPerSide) + offset, // Local Position
+                                            (new Vector3(x,y,z) / ParentCube.CubiesPerSide) + CubieOffset, // Local Position
                                             localScale, Quaternion.Euler(0f,0f,0f));
                         newCubie.ToggleFaces();
                         xIndexPositions[x] = newCubie.transform.localPosition.x;
@@ -53,6 +55,7 @@ namespace UnityRubixCube {
                     }
                 }
             }
+            CubieDistance = Vector3.Distance(SpawnedGameObjects[0].transform.position, SpawnedGameObjects[1].transform.position);
 
             return true;
         }

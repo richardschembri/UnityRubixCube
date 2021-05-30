@@ -14,6 +14,9 @@ namespace UnityRubixCube {
         Quaternion _targetRotation;
         RubixCube.Move _targetMove = null;
 
+        public bool IsLayerMoveSet(){
+            return _targetMove == null;
+        }
 
         public bool? IsUndo(){
             if(_targetMove == null){
@@ -89,6 +92,7 @@ namespace UnityRubixCube {
                 return false;
             }
             _targetMove = move;
+            Debug.Log(move.ToString());
             _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector() * (IsUndo().Value ? -90 : 90));
 
             float scale = 1f / ParentCube.CubiesPerSide;

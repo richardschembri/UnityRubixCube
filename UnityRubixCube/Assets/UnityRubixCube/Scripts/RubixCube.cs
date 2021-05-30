@@ -64,6 +64,12 @@ namespace UnityRubixCube {
                 return Vector3.zero;
             }
 
+
+            public override string ToString()
+            {
+                return $"Move - LayerIndex: {LayerIndex}, MoveAxis: {MoveAxis}, Clockwise: {Clockwise}, IsShuffle: {IsShuffle} ";
+            }
+
         }
 
         [SerializeField]
@@ -97,12 +103,20 @@ namespace UnityRubixCube {
             }
         }
 
+
+        public Vector3 CubieOffset {get { return _cubieSpawnerComponent.CubieOffset; } }
+        public float CubieDistance {get { return _cubieSpawnerComponent.CubieDistance; } }
+
         public bool IsCubieSelected(Cubie target){
             return SelectedCubie != null && target.ParentCube == this;
         }
 
         public bool IsCubieSelected(){
            return IsCubieSelected(SelectedCubie);
+        }
+
+        public bool IsLayerMoveSet(){
+            return _selectedLayer.IsLayerMoveSet();
         }
         public bool SelectCubie(Cubie target){
             if(IsCubieSelected(target)){
@@ -125,6 +139,8 @@ namespace UnityRubixCube {
         private bool IsNeighbourIndex(int a, int b){
             return Mathf.Abs(a - b) <= 1;
         }
+
+        // TODO: refactor
         public List<Cubie> GetNeighbours(Cubie target){
             var cubies = GetCubies();
             var result = new List<Cubie>();

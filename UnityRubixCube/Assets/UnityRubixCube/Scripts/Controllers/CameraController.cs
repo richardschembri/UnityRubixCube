@@ -114,6 +114,7 @@ namespace UnityRubixCube.Controllers{
 
             if (Input.GetMouseButton(0))
             {
+                //MoveCamera(Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"));
                 MoveCamera(Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"));
             }
         }
