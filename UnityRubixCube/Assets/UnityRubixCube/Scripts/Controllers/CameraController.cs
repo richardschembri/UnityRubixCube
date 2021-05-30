@@ -98,14 +98,16 @@ namespace UnityRubixCube.Controllers{
         }
 
         void MoveCamera(float x, float y){
+                if(Mathf.Abs(x) > Mathf.Abs(y)){
+                    transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
+                                                    transform.up,
+                                                    x * _cameraRotationSpeed);
+                }else{
+                    transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
+                                                    transform.right,
+                                                    y * _cameraRotationSpeed);
+                }
 
-                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
-                                                transform.up,
-                                                x * _cameraRotationSpeed);
-
-                transform.RotateAround(GameManager.Instance.MainRubixCube.transform.position,
-                                                transform.right,
-                                                y * _cameraRotationSpeed);
         }
         void HandleMouse(){
             if(Input.mouseScrollDelta.y != 0){

@@ -40,6 +40,7 @@ namespace UnityRubixCube.Managers{
         [SerializeField] private Button _continueButton;
         [SerializeField] private Button _menuButton;
         [SerializeField] private Button _undoButton;
+        [SerializeField] private Button _resetCameraButton;
         [SerializeField] private int _shuffles = 10;
 
         [Header("Popups")]
@@ -130,6 +131,7 @@ namespace UnityRubixCube.Managers{
         private void ToggleInGameButtons(bool on){
             _menuButton.gameObject.SetActive(on);
             _undoButton.gameObject.SetActive(on);
+            _resetCameraButton.gameObject.SetActive(on);
         }
 
         private void Shuffle(){

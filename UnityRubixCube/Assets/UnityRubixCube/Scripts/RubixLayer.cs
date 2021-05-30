@@ -92,7 +92,7 @@ namespace UnityRubixCube {
                 return false;
             }
             _targetMove = move;
-            Debug.Log(move.ToString());
+            // Debug.Log(move.ToString());
             _targetRotation = Quaternion.Euler(_targetMove.GetMoveVector() * (IsUndo().Value ? -90 : 90));
 
             float scale = 1f / ParentCube.CubiesPerSide;
@@ -126,6 +126,9 @@ namespace UnityRubixCube {
                 return false;
             }
             CurrentCubeState = RubixCube.ECubeState.MANUAL;
+            if(by == 0){
+                return true;
+            }
 
             var newAngle = _targetMove.GetMoveVector(true) * by * ParentCube.DragSensitivity;
             newAngle = new Vector3(Mathf.Clamp(newAngle.x, -90f, 90f),

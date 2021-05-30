@@ -173,6 +173,13 @@ namespace UnityRubixCube {
             _selectedLayer.OnMovePerformed.AddListener(SelectedLayerOnMovePerformed_Listener);
         }
 
+        public Vector3 GetLayerDirectionTo(Vector3 targetPosition){
+            return targetPosition - _selectedLayer.transform.position;
+        }
+        public Vector3 GetDirectionTo(Vector3 targetPosition){
+            return targetPosition - this.transform.position;
+        }
+
         #endregion RSMonoBehaviour Functions
 
         #region Events
