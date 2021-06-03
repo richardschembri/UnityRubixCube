@@ -118,18 +118,9 @@ namespace UnityRubixCube {
             }
             return RubixCube.ERubixAxis.Z;
         }
-        public RubixCube.ERubixAxis GetDragAxis(){
-
-            if(_dragCubie.Index.x != ParentCubie.Index.x){
-                return RubixCube.ERubixAxis.X;
-            }else if(_dragCubie.Index.y != ParentCubie.Index.y){
-                return RubixCube.ERubixAxis.Y;
-            }
-            return RubixCube.ERubixAxis.Z;
-        }
 
         // This function is an abomination that needs to be destroyed
-        private void SetDragModifier(RubixCube.Move move, bool isOpposite){
+        private void SetDragModifier(RubixCube.Move move, bool isOppositeCubie){
             var dirA = ParentCubie.transform.position - ParentCubie.ParentCube.GetSelectedLayerTransform().position;
             var dirB = _dragCubie.transform.position - ParentCubie.ParentCube.GetSelectedLayerTransform().position;
 
@@ -138,6 +129,10 @@ namespace UnityRubixCube {
             if((signedAngle < 0 && _dragDistance >= 0f) || (signedAngle >= 0 && _dragDistance < 0f))
             {
                _dragModifier = -1;
+            }
+            if(isOppositeCubie){
+
+               //_dragModifier = -_dragModifier;
             }
 
         }
@@ -174,10 +169,7 @@ namespace UnityRubixCube {
            if(_dragCubie == null){
                return;
            }
-            // Debug.Log(_dragDistance);
-            // Debug.Log($"{ParentCubie.ParentCube.GetCubeState()} {ParentCubie.name} -> {_dragCubie.name}");
             var commonAxis = GetCommonRubixAxis();
-            var dragAxis = GetDragAxis();
             int layerIndex = ParentCubie.Index.z;
             switch(commonAxis){
                 case RubixCube.ERubixAxis.X:
