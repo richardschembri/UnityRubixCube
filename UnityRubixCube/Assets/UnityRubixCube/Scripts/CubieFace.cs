@@ -89,6 +89,7 @@ namespace UnityRubixCube {
             Cubie oppositeCubie = null;
             for(int i = 0; i < cubies.Count; i++){
                 if( Vector3.Distance(dragOffsetPosition , cubies[i].transform.localPosition) < 0.1f ){
+                    isOpposite = false;
                     return cubies[i];
                 }else if ( Vector3.Distance(dragOppositeOffsetPosition, cubies[i].transform.localPosition) < 0.1f){
                     isOpposite = true;
@@ -132,7 +133,7 @@ namespace UnityRubixCube {
             }
             if(isOppositeCubie){
 
-               //_dragModifier = -_dragModifier;
+               _dragModifier = -_dragModifier;
             }
 
         }
