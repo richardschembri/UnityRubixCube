@@ -276,6 +276,9 @@ namespace UnityRubixCube {
         public bool IsLayerMoveSet(){
             return _selectedLayer.IsLayerMoveSet();
         }
+        public Transform GetSelectedLayerTransform(){
+            return _selectedLayer.transform;
+        }
         #endregion Selected Layer wrapper functions
 
         #region Moves wrapper functions

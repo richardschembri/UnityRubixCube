@@ -86,15 +86,16 @@ namespace UnityRubixCube {
             var dragOppositeOffsetPosition = GetDragOffsetLocalPosition(false);  
             var cubies = ParentCubie.ParentCube.GetCubies();
             isOpposite = false;
+            Cubie oppositeCubie = null;
             for(int i = 0; i < cubies.Count; i++){
                 if( Vector3.Distance(dragOffsetPosition , cubies[i].transform.localPosition) < 0.1f ){
                     return cubies[i];
                 }else if ( Vector3.Distance(dragOppositeOffsetPosition, cubies[i].transform.localPosition) < 0.1f){
                     isOpposite = true;
-                    return cubies[i];
+                    oppositeCubie = cubies[i];
                 }    
             }
-            return null;
+            return oppositeCubie;
         }
 
 
@@ -128,61 +129,16 @@ namespace UnityRubixCube {
         }
 
         // This function is an abomination that needs to be destroyed
-        private void SetDragModifier(RubixCube.ERubixAxis commonAxis, RubixCube.ERubixAxis dragAxis, bool isOpposite){
-            // Debug.Log("Check Is IsOpposite");
+        private void SetDragModifier(RubixCube.Move move, bool isOpposite){
+            var dirA = ParentCubie.transform.position - ParentCubie.ParentCube.GetSelectedLayerTransform().position;
+            var dirB = _dragCubie.transform.position - ParentCubie.ParentCube.GetSelectedLayerTransform().position;
+
+            var signedAngle = Vector3.SignedAngle(dirA, dirB, move.GetMoveVector());
             _dragModifier = 1;
-            switch(dragAxis){
-                case RubixCube.ERubixAxis.X:
-                    // Debug.Log("Drag axis X");
-                    if(commonAxis == RubixCube.ERubixAxis.Y){
-                        // Debug.Log("Common axis Y");
-                        _dragModifier = -1;
-                        if(!ParentCubie.IsTop(RubixCube.ERubixAxis.Z)){
-                        }
-                    }else // Z
-                    {
-                        // Debug.Log("Common axis Z");
-                        _dragModifier = -1;
-                        if(ParentCubie.IsTop(RubixCube.ERubixAxis.Y)){
-                        }
-
-                    }
-                break;
-                case RubixCube.ERubixAxis.Y:
-                    // Debug.Log("Drag axis Y");
-                    if(commonAxis == RubixCube.ERubixAxis.X){
-                        // Debug.Log("Common axis X");
-                        if(ParentCubie.IsTop(RubixCube.ERubixAxis.Z)){
-                            _dragModifier = -1;
-                        }
-                    }else // Z
-                    {
-                        // Debug.Log("Common axis Z");
-                        // Drag along X
-                        if(ParentCubie.IsBottom(RubixCube.ERubixAxis.X)){
-                            _dragModifier = -1;
-                        }
-                    }
-                break;
-                case RubixCube.ERubixAxis.Z:
-                    // Debug.Log("Drag axis Z");
-                    if(commonAxis == RubixCube.ERubixAxis.Y){
-                        // Debug.Log("Common axis Y");
-                            _dragModifier = -1;
-                        if(ParentCubie.IsTop(RubixCube.ERubixAxis.X)){
-                        }
-
-                    }else // X
-                    {
-                        // Debug.Log("Common axis X");
-                        if(!ParentCubie.IsTop(RubixCube.ERubixAxis.Y) ){
-                            //_dragModifier = -1;
-                        }
-
-                    }
-                break;
+            if((signedAngle < 0 && _dragDistance >= 0f) || (signedAngle >= 0 && _dragDistance < 0f))
+            {
+               _dragModifier = -1;
             }
-                           //  Debug.Log($"Drag Modifier: {_dragModifier }");
 
         }
         void HandleDrag(){
@@ -231,8 +187,8 @@ namespace UnityRubixCube {
                 layerIndex = ParentCubie.Index.y;
                 break;
             }
-            SetDragModifier(commonAxis, dragAxis, isOpposite);
             var newMove = new RubixCube.Move(layerIndex, commonAxis, true, false);
+            SetDragModifier(newMove, isOpposite);
              ParentCubie.ParentCube.SetLayerMove(newMove); //isClockwise); //zDiff > 0);
             ParentCubie.ParentCube.ManualRotate(0f);
         }
